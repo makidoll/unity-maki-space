@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 public class MaterialLoader
@@ -40,13 +39,14 @@ public class MaterialLoader
 
     public MaterialLoader()
     {
-        var resourcePackGuids = AssetDatabase.FindAssets("", new[] {"Assets/Resources/Resource Packs"});
-        if (resourcePackGuids.Length == 0) throw new Exception("No resource packs found");
-
-        var resourcePackPath = AssetDatabase.GUIDToAssetPath(resourcePackGuids[0])
-            .Replace("Assets/Resources/", "")
-            .Replace(".bytes", "");
-        var resourcePackBytes = Resources.Load<TextAsset>(resourcePackPath).bytes;
+        // var resourcePackGuids = AssetDatabase.FindAssets("", new[] {"Assets/Resources/Resource Packs"});
+        // if (resourcePackGuids.Length == 0) throw new Exception("No resource packs found");
+        //
+        // var resourcePackPath = AssetDatabase.GUIDToAssetPath(resourcePackGuids[0])
+        //     .Replace("Assets/Resources/", "")
+        //     .Replace(".bytes", "");
+        
+        var resourcePackBytes = Resources.Load<TextAsset>("Resource Packs/Dandelion+X+1.19b").bytes;
         var resourcePackStream = new MemoryStream(resourcePackBytes);
 
         archive = new ZipArchive(resourcePackStream, ZipArchiveMode.Read);
