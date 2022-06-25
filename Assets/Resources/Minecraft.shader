@@ -56,7 +56,7 @@ Shader "Maki/Minecraft"
                 if (i.color.r < 0.5 && i.color.g > 0.5 && i.color.b < 0.5)
                 {
                     const float distance = sqrt(pow(col.r - col.g, 2) + pow(col.g - col.b, 2) + pow(col.b - col.r, 2));
-                    if (distance < 0.01)
+                    if (distance < 0.1)
                     {
                         // randomly sampled from
                         // https://minecraft.fandom.com/wiki/Color?file=Grasscolor.png#Grass

@@ -14,6 +14,7 @@ public static class DataTypes
 
     public enum Block
     {
+        Air, // must be first
         Grass,
         Dirt,
     }

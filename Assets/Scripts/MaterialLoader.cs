@@ -109,6 +109,8 @@ public class MaterialLoader
 
     public Rect GetBlockSideUv(DataTypes.Block block, DataTypes.BlockSide blockSide)
     {
+        if (!DataTypes.BlockSideTextureNames.ContainsKey(block)) return Rect.zero;
+        
         var texturePath = DataTypes.BlockSideTextureNames[block][blockSide];
         var coords = atlasTexturePositions[texturePath];
 
