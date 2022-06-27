@@ -23,9 +23,9 @@ public class ChunkSystem : MonoBehaviour
     private void Awake()
     {
         materialLoader = new MaterialLoader();
-        for (var x = -3; x <= 3; x++)
+        for (var x = -2; x <= 2; x++)
         {
-            for (var z = -3; z <= 3; z++)
+            for (var z = -2; z <= 2; z++)
             {
                 var position = new Vector3Int(x, 0, z);
                 var chunk = GetChunk(position);
