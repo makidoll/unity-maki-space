@@ -44,15 +44,6 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        var moveXy = inputActions.Player.Move.ReadValue<Vector2>();
-        if (moveXy != Vector2.zero)
-        {
-            var positionOffset = Quaternion.Euler(0, transform.localEulerAngles.y, 0) *
-                                 new Vector3(moveXy.x, 0, moveXy.y);
-
-            rigidbody.MovePosition(transform.position + positionOffset * 0.1f);
-        }
-
         var ray = new Ray(camera.transform.position, camera.transform.forward);
         Physics.Raycast(ray, out var hitData, 4f, LayerMask.GetMask("Chunk"));
 
@@ -74,11 +65,25 @@ public class PlayerController : MonoBehaviour
         }
 
         selectionCube.SetActive(highlightingBlock);
+        
+        // everything onward is only when mouse locked
+        
+        if (Cursor.lockState != CursorLockMode.Locked) return;
+        
+        var moveXy = inputActions.Player.Move.ReadValue<Vector2>();
+        if (moveXy != Vector2.zero)
+        {
+            var positionOffset = Quaternion.Euler(0, transform.localEulerAngles.y, 0) *
+                                 new Vector3(moveXy.x, 0, moveXy.y);
+
+            rigidbody.MovePosition(transform.position + positionOffset * 0.1f);
+        }
     }
 
     private void OnLook(InputAction.CallbackContext context)
     {
         if (Cursor.lockState != CursorLockMode.Locked) return;
+        
         const float sensitivity = 0.125f;
 
         var lookDelta = context.ReadValue<Vector2>();
@@ -94,7 +99,7 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
     }
 
-    private void OnPlace(InputAction.CallbackContext context)
+    private void OnBreak(InputAction.CallbackContext context)
     {
         if (Cursor.lockState != CursorLockMode.Locked)
         {
@@ -104,15 +109,15 @@ public class PlayerController : MonoBehaviour
 
         if (!highlightingBlock) return;
 
-        chunkSystem.SetBlock(placePosition, DataTypes.Block.Grass);
+        chunkSystem.SetBlock(destroyPosition, DataTypes.Block.Air);
     }
-
-    private void OnBreak(InputAction.CallbackContext context)
+    
+    private void OnPlace(InputAction.CallbackContext context)
     {
         if (Cursor.lockState != CursorLockMode.Locked) return;
 
         if (!highlightingBlock) return;
 
-        chunkSystem.SetBlock(destroyPosition, DataTypes.Block.Air);
+        chunkSystem.SetBlock(placePosition, DataTypes.Block.Grass);
     }
 }

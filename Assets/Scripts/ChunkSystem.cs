@@ -16,7 +16,6 @@ public class ChunkSystem : MonoBehaviour
         if (chunks.ContainsKey(position)) return chunks[position];
         var chunk = new Chunk(this, materialLoader, position);
         chunks[position] = chunk;
-
         return chunk;
     }
 
@@ -62,20 +61,33 @@ public class ChunkSystem : MonoBehaviour
 
         var chunk = chunkAndPosition.Value.Item1;
         var position = chunkAndPosition.Value.Item2;
-        return chunk.GetChunkData()[position.x, position.y, position.z];
+        return chunk.GetBlock(position);
     }
 
+    private void GenerateMesh(Vector3Int worldPosition)
+    {
+        var chunkAndPosition = WorldSpaceToChunkPosition(worldPosition);
+        if (chunkAndPosition == null) return;
+        chunkAndPosition.Value.Item1.GenerateMesh();
+    }
+    
     public void SetBlock(Vector3Int worldPosition, DataTypes.Block block)
     {
         var chunkAndPosition = WorldSpaceToChunkPosition(worldPosition);
         if (chunkAndPosition == null) return;
 
         var chunk = chunkAndPosition.Value.Item1;
-        var position = chunkAndPosition.Value.Item2;
+        var positionInChunk = chunkAndPosition.Value.Item2;
 
-        chunk.SetBlock(position, block);
+        chunk.SetBlock(positionInChunk, block);
         chunk.GenerateMesh();
-
-        // TODO: IF ON THE EDGE GENERATE MESH ON THE OTHER CHUNK TOO
+        
+        // we need to regenerate the mesh of a nearby chunk if we're on the edge
+        
+        const int edge = Chunk.ChunkSize - 1;
+        if (positionInChunk.x == 0) GenerateMesh(worldPosition + new Vector3Int(-1, 0, 0));
+        if (positionInChunk.z == 0) GenerateMesh(worldPosition + new Vector3Int(0, 0, -1));
+        if (positionInChunk.x == edge) GenerateMesh(worldPosition + new Vector3Int(1, 0, 0));
+        if (positionInChunk.z == edge) GenerateMesh(worldPosition + new Vector3Int(0, 0, 1));
     }
 };

@@ -7,6 +7,7 @@ public class Chunk
     private readonly ChunkSystem chunkSystem;
     private readonly MaterialLoader materialLoader;
 
+    private bool chunkGameObjectLoaded;
     private MeshFilter meshFilter;
     private MeshCollider meshCollider;
 
@@ -26,7 +27,7 @@ public class Chunk
 
         for (var y = 0; y < ChunkHeight; y++)
         {
-            if (y >= 128) continue; // keep air
+            if (y >= 128 + chunkPosition.z + chunkPosition.x) continue; // keep air
             for (var x = 0; x < ChunkSize; x++)
             {
                 for (var z = 0; z < ChunkSize; z++)
@@ -37,14 +38,16 @@ public class Chunk
         }
     }
 
-    public DataTypes.Block[,,] GetChunkData()
+    public void SetBlock(Vector3Int positionInChunk, DataTypes.Block block)
     {
-        return chunkData;
+        chunkData[positionInChunk.x, positionInChunk.y, positionInChunk.z] = block;
     }
 
-    public void SetBlock(Vector3Int position, DataTypes.Block block)
+    public DataTypes.Block GetBlock(Vector3Int positionInChunk)
     {
-        chunkData[position.x, position.y, position.z] = block;
+        if (positionInChunk.x is < 0 or > ChunkSize - 1 || positionInChunk.y is < 0 or > ChunkHeight - 1 ||
+            positionInChunk.z is < 0 or > ChunkSize - 1) return DataTypes.Block.Air;
+        return chunkData[positionInChunk.x, positionInChunk.y, positionInChunk.z];
     }
 
     // 0 --- 1
@@ -112,7 +115,7 @@ public class Chunk
         }
     }
 
-    private bool IsAirAroundBlock(Vector3Int position, DataTypes.BlockSide blockSide)
+    private bool IsAirAroundBlock(Vector3Int blockPositionInChunk, DataTypes.BlockSide blockSide)
     {
         var queryOffset = blockSide switch
         {
@@ -125,42 +128,32 @@ public class Chunk
             _ => Vector3Int.zero
         };
 
-        var queryPosition = queryOffset + position;
-        if (queryPosition.y is < 0 or > ChunkHeight - 1) return true;
+        var queryPositionInChunk = queryOffset + blockPositionInChunk;
+        if (queryPositionInChunk.y is < 0 or > ChunkHeight - 1) return true; // top and bottom
 
-        // peak left
-        if (queryPosition.x < 0)
+        const int edge = ChunkSize - 1;
+
+        switch (queryPositionInChunk.x)
         {
-            return chunkSystem.GetChunk(chunkPosition + new Vector3Int(-1, 0, 0)).GetChunkData()[
-                ChunkSize - 1, position.y, position.z
-            ] == DataTypes.Block.Air;
+            case < 0:
+                return chunkSystem.GetChunk(chunkPosition + queryOffset)
+                    .GetBlock(new Vector3Int(edge, blockPositionInChunk.y, blockPositionInChunk.z)) == DataTypes.Block.Air;
+            case > edge:
+                return chunkSystem.GetChunk(chunkPosition + queryOffset)
+                    .GetBlock(new Vector3Int(0, blockPositionInChunk.y, blockPositionInChunk.z)) == DataTypes.Block.Air;
         }
-
-        // peak right
-        if (queryPosition.x > ChunkSize - 1)
+        
+        switch (queryPositionInChunk.z)
         {
-            return chunkSystem.GetChunk(chunkPosition + new Vector3Int(1, 0, 0)).GetChunkData()[
-                0, position.y, position.z
-            ] == DataTypes.Block.Air;
+            case < 0:
+                return chunkSystem.GetChunk(chunkPosition + queryOffset)
+                    .GetBlock(new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, edge)) == DataTypes.Block.Air;
+            case > edge:
+                return chunkSystem.GetChunk(chunkPosition + queryOffset)
+                    .GetBlock(new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, 0)) == DataTypes.Block.Air;
         }
-
-        // peak back
-        if (queryPosition.z < 0)
-        {
-            return chunkSystem.GetChunk(chunkPosition + new Vector3Int(0, 0, -1)).GetChunkData()[
-                ChunkSize - 1, position.y, position.z
-            ] == DataTypes.Block.Air;
-        }
-
-        // peak front
-        if (queryPosition.z > ChunkSize - 1)
-        {
-            return chunkSystem.GetChunk(chunkPosition + new Vector3Int(0, 0, 1)).GetChunkData()[
-                0, position.y, position.z
-            ] == DataTypes.Block.Air;
-        }
-
-        var queryBlock = chunkData[queryPosition.x, queryPosition.y, queryPosition.z];
+        
+        var queryBlock = chunkData[queryPositionInChunk.x, queryPositionInChunk.y, queryPositionInChunk.z];
         return queryBlock == DataTypes.Block.Air;
     }
 
@@ -189,10 +182,14 @@ public class Chunk
 
         meshCollider = chunkGameObject.AddComponent<MeshCollider>();
         // meshCollider.sharedMesh = mesh;
+
+        chunkGameObjectLoaded = true;
     }
 
     public void GenerateMesh()
     {
+        if (!chunkGameObjectLoaded) return;
+
         var mesh = new Mesh();
 
         var meshAsLists = new MeshAsLists()

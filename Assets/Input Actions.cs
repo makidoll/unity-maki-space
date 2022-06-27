@@ -46,18 +46,18 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Place"",
+                    ""name"": ""Break"",
                     ""type"": ""Button"",
-                    ""id"": ""0394984e-ed7e-4ffa-8989-4f9356b311c4"",
+                    ""id"": ""86aaae5b-2d9c-407f-bff6-184dae1bb5e1"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Break"",
+                    ""name"": ""Place"",
                     ""type"": ""Button"",
-                    ""id"": ""86aaae5b-2d9c-407f-bff6-184dae1bb5e1"",
+                    ""id"": ""0394984e-ed7e-4ffa-8989-4f9356b311c4"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -142,17 +142,6 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""b8fb4aaf-255c-4638-81e2-63e80250d44c"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Place"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""6817a712-802a-4ecb-bdc8-9753380914a1"",
                     ""path"": ""<Keyboard>/escape"",
                     ""interactions"": """",
@@ -165,11 +154,22 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""074fd1e5-e71d-4c35-9118-5f3d91a6d7fc"",
-                    ""path"": ""<Mouse>/rightButton"",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Break"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b8fb4aaf-255c-4638-81e2-63e80250d44c"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Place"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -243,8 +243,8 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
-        m_Player_Place = m_Player.FindAction("Place", throwIfNotFound: true);
         m_Player_Break = m_Player.FindAction("Break", throwIfNotFound: true);
+        m_Player_Place = m_Player.FindAction("Place", throwIfNotFound: true);
         m_Player_Unfocus = m_Player.FindAction("Unfocus", throwIfNotFound: true);
     }
 
@@ -307,8 +307,8 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     private IPlayerActions m_PlayerActionsCallbackInterface;
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Look;
-    private readonly InputAction m_Player_Place;
     private readonly InputAction m_Player_Break;
+    private readonly InputAction m_Player_Place;
     private readonly InputAction m_Player_Unfocus;
     public struct PlayerActions
     {
@@ -316,8 +316,8 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         public PlayerActions(@InputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @Look => m_Wrapper.m_Player_Look;
-        public InputAction @Place => m_Wrapper.m_Player_Place;
         public InputAction @Break => m_Wrapper.m_Player_Break;
+        public InputAction @Place => m_Wrapper.m_Player_Place;
         public InputAction @Unfocus => m_Wrapper.m_Player_Unfocus;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
@@ -334,12 +334,12 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Look.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLook;
                 @Look.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLook;
                 @Look.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLook;
-                @Place.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPlace;
-                @Place.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPlace;
-                @Place.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPlace;
                 @Break.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnBreak;
                 @Break.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnBreak;
                 @Break.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnBreak;
+                @Place.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPlace;
+                @Place.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPlace;
+                @Place.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPlace;
                 @Unfocus.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnUnfocus;
                 @Unfocus.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnUnfocus;
                 @Unfocus.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnUnfocus;
@@ -353,12 +353,12 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Look.started += instance.OnLook;
                 @Look.performed += instance.OnLook;
                 @Look.canceled += instance.OnLook;
-                @Place.started += instance.OnPlace;
-                @Place.performed += instance.OnPlace;
-                @Place.canceled += instance.OnPlace;
                 @Break.started += instance.OnBreak;
                 @Break.performed += instance.OnBreak;
                 @Break.canceled += instance.OnBreak;
+                @Place.started += instance.OnPlace;
+                @Place.performed += instance.OnPlace;
+                @Place.canceled += instance.OnPlace;
                 @Unfocus.started += instance.OnUnfocus;
                 @Unfocus.performed += instance.OnUnfocus;
                 @Unfocus.canceled += instance.OnUnfocus;
@@ -415,8 +415,8 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
-        void OnPlace(InputAction.CallbackContext context);
         void OnBreak(InputAction.CallbackContext context);
+        void OnPlace(InputAction.CallbackContext context);
         void OnUnfocus(InputAction.CallbackContext context);
     }
 }
