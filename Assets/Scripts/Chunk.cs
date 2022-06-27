@@ -223,5 +223,12 @@ public class Chunk
 
         var meshFilter = chunkGameObject.AddComponent<MeshFilter>();
         meshFilter.mesh = mesh;
+
+        var rigidbody = chunkGameObject.AddComponent<Rigidbody>();
+        rigidbody.isKinematic = true;
+        rigidbody.useGravity = false;
+
+        var meshCollider = chunkGameObject.AddComponent<MeshCollider>();
+        meshCollider.sharedMesh = mesh;
     }
 }
