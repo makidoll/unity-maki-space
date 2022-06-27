@@ -2,73 +2,60 @@ Shader "Maki/Minecraft"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        _MainTex ("Albedo (RGB)", 2D) = "white" {}
     }
     SubShader
     {
         Tags { "RenderType"="Opaque" }
-        LOD 100
+        LOD 200
 
-        Pass
+        CGPROGRAM
+        // Physically based Standard lighting model, and enable shadows on all light types
+        #pragma surface surf Standard fullforwardshadows
+
+        // Use shader model 3.0 target, to get nicer looking lighting
+        #pragma target 3.0
+
+        sampler2D _MainTex;
+
+        struct Input
         {
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            // make fog work
-            #pragma multi_compile_fog
+            float2 uv_MainTex;
+            float4 color : COLOR;
+        };
 
-            #include "UnityCG.cginc"
 
-            struct appdata
+        // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
+        // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
+        // #pragma instancing_options assumeuniformscaling
+        UNITY_INSTANCING_BUFFER_START(Props)
+            // put more per-instance properties here
+        UNITY_INSTANCING_BUFFER_END(Props)
+
+        void surf (Input IN, inout SurfaceOutputStandard o)
+        {
+            // Albedo comes from a texture tinted by color
+            fixed4 col = tex2D (_MainTex, IN.uv_MainTex);
+
+            // must be grass
+            if (IN.color.r < 0.5 && IN.color.g > 0.5 && IN.color.b < 0.5)
             {
-                float4 vertex : POSITION;
-                float4 color : COLOR;
-                float2 uv : TEXCOORD0;
-            };
-
-            struct v2f
-            {
-                float2 uv : TEXCOORD0;
-                UNITY_FOG_COORDS(1)
-                float4 vertex : SV_POSITION;
-                float4 color : COLOR;
-            };
-
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
-
-            v2f vert (appdata v)
-            {
-                v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                o.color = v.color;
-                UNITY_TRANSFER_FOG(o,o.vertex);
-                return o;
-            }
-
-            fixed4 frag (v2f i) : SV_Target
-            {
-                // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
-
-                // must be grass
-                if (i.color.r < 0.5 && i.color.g > 0.5 && i.color.b < 0.5)
+                const float distance = sqrt(pow(col.r - col.g, 2) + pow(col.g - col.b, 2) + pow(col.b - col.r, 2));
+                if (distance < 0.1)
                 {
-                    const float distance = sqrt(pow(col.r - col.g, 2) + pow(col.g - col.b, 2) + pow(col.b - col.r, 2));
-                    if (distance < 0.1)
-                    {
-                        // randomly sampled from
-                        // https://minecraft.fandom.com/wiki/Color?file=Grasscolor.png#Grass
-                        col.rgb *= fixed3(129, 190, 92) / 255;
-                    }    
-                }
-                                
-                // apply fog
-                UNITY_APPLY_FOG(i.fogCoord, col);
-                return col;
+                    // randomly sampled from
+                    // https://minecraft.fandom.com/wiki/Color?file=Grasscolor.png#Grass
+                    col.rgb *= fixed3(129, 190, 92) / 255;
+                }    
             }
-            ENDCG
+            
+            o.Albedo = col.rgb;
+            // Metallic and smoothness come from slider variables
+            o.Metallic = 0;
+            o.Smoothness = 0;
+            o.Alpha = col.a;
         }
+        ENDCG
     }
+    FallBack "Diffuse"
 }
