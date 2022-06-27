@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,8 +7,11 @@ public class Chunk
     private readonly ChunkSystem chunkSystem;
     private readonly MaterialLoader materialLoader;
 
-    private const int ChunkSize = 16;
-    private const int ChunkHeight = 256;
+    private MeshFilter meshFilter;
+    private MeshCollider meshCollider;
+
+    public const int ChunkSize = 16;
+    public const int ChunkHeight = 256;
 
     private readonly DataTypes.Block[,,] chunkData = new DataTypes.Block[ChunkSize, ChunkHeight, ChunkSize];
     private readonly Vector3Int chunkPosition;
@@ -34,15 +35,16 @@ public class Chunk
                 }
             }
         }
-
-        chunkData[1, 128, 1] = DataTypes.Block.Grass;
-        chunkData[1, 130, 1] = DataTypes.Block.Grass;
-        chunkData[0, 134, 0] = DataTypes.Block.Grass;
     }
 
     public DataTypes.Block[,,] GetChunkData()
     {
         return chunkData;
+    }
+
+    public void SetBlock(Vector3Int position, DataTypes.Block block)
+    {
+        chunkData[position.x, position.y, position.z] = block;
     }
 
     // 0 --- 1
@@ -58,7 +60,7 @@ public class Chunk
         {DataTypes.BlockSide.Top, new Vector3[] {new(-1, 1, 1), new(1, 1, 1), new(1, 1, -1), new(-1, 1, -1)}},
         {DataTypes.BlockSide.Bottom, new Vector3[] {new(-1, -1, -1), new(1, -1, -1), new(1, -1, 1), new(-1, -1, 1)}},
     };
-    
+
     private static readonly Dictionary<DataTypes.BlockSide, Vector3> SideNormals = new()
     {
         {DataTypes.BlockSide.Front, new Vector3(0, 0, -1)},
@@ -168,11 +170,29 @@ public class Chunk
         {
             transform =
             {
-                position = chunkPosition * ChunkSize + (new Vector3(-ChunkSize, -ChunkHeight, -ChunkSize) / 2f +
-                                                        new Vector3(0.5f, 0.5f, 0.5f))
-            }
+                position = chunkPosition * ChunkSize
+            },
+            layer = LayerMask.NameToLayer("Chunk")
         };
 
+        var meshRenderer = chunkGameObject.AddComponent<MeshRenderer>();
+
+        var atlasMaterial = materialLoader.GetAtlasMaterial();
+        meshRenderer.material = atlasMaterial;
+
+        meshFilter = chunkGameObject.AddComponent<MeshFilter>();
+        // meshFilter.mesh = mesh;
+
+        var rigidbody = chunkGameObject.AddComponent<Rigidbody>();
+        rigidbody.isKinematic = true;
+        rigidbody.useGravity = false;
+
+        meshCollider = chunkGameObject.AddComponent<MeshCollider>();
+        // meshCollider.sharedMesh = mesh;
+    }
+
+    public void GenerateMesh()
+    {
         var mesh = new Mesh();
 
         var meshAsLists = new MeshAsLists()
@@ -216,19 +236,7 @@ public class Chunk
         mesh.colors = meshAsLists.colors.ToArray();
         mesh.Optimize();
 
-        var meshRenderer = chunkGameObject.AddComponent<MeshRenderer>();
-
-        var atlasMaterial = materialLoader.GetAtlasMaterial();
-        meshRenderer.material = atlasMaterial;
-
-        var meshFilter = chunkGameObject.AddComponent<MeshFilter>();
         meshFilter.mesh = mesh;
-
-        var rigidbody = chunkGameObject.AddComponent<Rigidbody>();
-        rigidbody.isKinematic = true;
-        rigidbody.useGravity = false;
-
-        var meshCollider = chunkGameObject.AddComponent<MeshCollider>();
         meshCollider.sharedMesh = mesh;
     }
 }

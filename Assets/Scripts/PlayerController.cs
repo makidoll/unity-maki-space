@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,10 +5,17 @@ public class PlayerController : MonoBehaviour
 {
     private InputActions inputActions;
 
-    private Camera camera;
+    private new Camera camera;
     private float cameraPitch;
 
-    private Rigidbody rigidbody;
+    private new Rigidbody rigidbody;
+
+    public ChunkSystem chunkSystem;
+
+    private bool highlightingBlock;
+    private Vector3Int placePosition;
+    private Vector3Int destroyPosition;
+    public GameObject selectionCube;
 
     private void Awake()
     {
@@ -28,11 +32,14 @@ public class PlayerController : MonoBehaviour
         inputActions.Player.Look.performed += OnLook;
         inputActions.Player.Look.Enable();
 
-        inputActions.Player.Focus.performed += OnFocus;
-        inputActions.Player.Focus.Enable();
-
         inputActions.Player.Unfocus.performed += OnUnfocus;
         inputActions.Player.Unfocus.Enable();
+
+        inputActions.Player.Place.performed += OnPlace;
+        inputActions.Player.Place.Enable();
+
+        inputActions.Player.Break.performed += OnBreak;
+        inputActions.Player.Break.Enable();
     }
 
     private void FixedUpdate()
@@ -43,8 +50,30 @@ public class PlayerController : MonoBehaviour
             var positionOffset = Quaternion.Euler(0, transform.localEulerAngles.y, 0) *
                                  new Vector3(moveXy.x, 0, moveXy.y);
 
-            rigidbody.velocity = positionOffset * 10f;
+            rigidbody.MovePosition(transform.position + positionOffset * 0.1f);
         }
+
+        var ray = new Ray(camera.transform.position, camera.transform.forward);
+        Physics.Raycast(ray, out var hitData, 4f, LayerMask.GetMask("Chunk"));
+
+        highlightingBlock = hitData.distance != 0;
+
+        if (highlightingBlock)
+        {
+            var rawPlacePosition = hitData.point + (hitData.normal * 0.5f);
+            placePosition = new Vector3Int(Mathf.FloorToInt(rawPlacePosition.x + 0.5f),
+                Mathf.FloorToInt(rawPlacePosition.y + 0.5f),
+                Mathf.FloorToInt(rawPlacePosition.z + 0.5f));
+
+            var rawDestroyPosition = hitData.point + (hitData.normal * -0.5f);
+            destroyPosition = new Vector3Int(Mathf.FloorToInt(rawDestroyPosition.x + 0.5f),
+                Mathf.FloorToInt(rawDestroyPosition.y + 0.5f),
+                Mathf.FloorToInt(rawDestroyPosition.z + 0.5f));
+
+            selectionCube.transform.position = destroyPosition;
+        }
+
+        selectionCube.SetActive(highlightingBlock);
     }
 
     private void OnLook(InputAction.CallbackContext context)
@@ -56,17 +85,34 @@ public class PlayerController : MonoBehaviour
         transform.localEulerAngles += new Vector3(0, lookDelta.x * sensitivity, 0);
 
         cameraPitch = Mathf.Clamp(cameraPitch + -lookDelta.y * sensitivity, -90, 90);
-        camera.transform.localEulerAngles = new Vector3(cameraPitch, camera.transform.localEulerAngles.y, camera.transform.localEulerAngles.z);
-    }
-
-    private static void OnFocus(InputAction.CallbackContext context)
-    {
-        if (Cursor.lockState == CursorLockMode.Locked) return;
-        Cursor.lockState = CursorLockMode.Locked;
+        camera.transform.localEulerAngles = new Vector3(cameraPitch, camera.transform.localEulerAngles.y,
+            camera.transform.localEulerAngles.z);
     }
 
     private static void OnUnfocus(InputAction.CallbackContext context)
     {
         Cursor.lockState = CursorLockMode.None;
+    }
+
+    private void OnPlace(InputAction.CallbackContext context)
+    {
+        if (Cursor.lockState != CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            return;
+        }
+
+        if (!highlightingBlock) return;
+
+        chunkSystem.SetBlock(placePosition, DataTypes.Block.Grass);
+    }
+
+    private void OnBreak(InputAction.CallbackContext context)
+    {
+        if (Cursor.lockState != CursorLockMode.Locked) return;
+
+        if (!highlightingBlock) return;
+
+        chunkSystem.SetBlock(destroyPosition, DataTypes.Block.Air);
     }
 }

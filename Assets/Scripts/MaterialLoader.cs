@@ -45,7 +45,7 @@ public class MaterialLoader
         // var resourcePackPath = AssetDatabase.GUIDToAssetPath(resourcePackGuids[0])
         //     .Replace("Assets/Resources/", "")
         //     .Replace(".bytes", "");
-        
+
         var resourcePackBytes = Resources.Load<TextAsset>("Resource Packs/Dandelion+X+1.19b").bytes;
         var resourcePackStream = new MemoryStream(resourcePackBytes);
 
@@ -87,7 +87,7 @@ public class MaterialLoader
             var texturePath = requiredTexturePaths[i];
             var texture = GetTexture(texturePath);
             var x = i % AtlasWidth;
-            var y = (int) Mathf.Floor((float) i / AtlasWidth);
+            var y = Mathf.FloorToInt((float) i / AtlasWidth);
             atlasTexturePositions[texturePath] = new Vector2Int(x, y);
             atlasTexture.SetPixels(x * textureSize, y * textureSize, textureSize, textureSize, texture.GetPixels());
         }
@@ -110,7 +110,7 @@ public class MaterialLoader
     public Rect GetBlockSideUv(DataTypes.Block block, DataTypes.BlockSide blockSide)
     {
         if (!DataTypes.BlockSideTextureNames.ContainsKey(block)) return Rect.zero;
-        
+
         var texturePath = DataTypes.BlockSideTextureNames[block][blockSide];
         var coords = atlasTexturePositions[texturePath];
 

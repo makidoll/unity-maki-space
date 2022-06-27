@@ -16,10 +16,10 @@ public class ChunkSystem : MonoBehaviour
         if (chunks.ContainsKey(position)) return chunks[position];
         var chunk = new Chunk(this, materialLoader, position);
         chunks[position] = chunk;
-        
+
         return chunk;
-    } 
-    
+    }
+
     private void Awake()
     {
         materialLoader = new MaterialLoader();
@@ -30,7 +30,52 @@ public class ChunkSystem : MonoBehaviour
                 var position = new Vector3Int(x, 0, z);
                 var chunk = GetChunk(position);
                 chunk.MakeChunkGameObject();
+                chunk.GenerateMesh();
             }
         }
+    }
+
+    private static int GlslMod(int x, int m)
+    {
+        return (x % m + m) % m;
+    }
+
+    private (Chunk, Vector3Int)? WorldSpaceToChunkPosition(Vector3Int worldPosition)
+    {
+        var chunkPosition = new Vector3Int(Mathf.FloorToInt((float) worldPosition.x / Chunk.ChunkSize), 0,
+            Mathf.FloorToInt((float) worldPosition.z / Chunk.ChunkSize));
+
+        var chunk = chunks[chunkPosition];
+        if (chunk == null) return null;
+
+        var blockPosition = new Vector3Int(GlslMod(worldPosition.x, Chunk.ChunkSize),
+            GlslMod(worldPosition.y, Chunk.ChunkHeight),
+            GlslMod(worldPosition.z, Chunk.ChunkSize));
+
+        return (chunk, blockPosition);
+    }
+
+    public DataTypes.Block GetBlock(Vector3Int worldPosition)
+    {
+        var chunkAndPosition = WorldSpaceToChunkPosition(worldPosition);
+        if (chunkAndPosition == null) return DataTypes.Block.Air;
+
+        var chunk = chunkAndPosition.Value.Item1;
+        var position = chunkAndPosition.Value.Item2;
+        return chunk.GetChunkData()[position.x, position.y, position.z];
+    }
+
+    public void SetBlock(Vector3Int worldPosition, DataTypes.Block block)
+    {
+        var chunkAndPosition = WorldSpaceToChunkPosition(worldPosition);
+        if (chunkAndPosition == null) return;
+
+        var chunk = chunkAndPosition.Value.Item1;
+        var position = chunkAndPosition.Value.Item2;
+
+        chunk.SetBlock(position, block);
+        chunk.GenerateMesh();
+
+        // TODO: IF ON THE EDGE GENERATE MESH ON THE OTHER CHUNK TOO
     }
 };
