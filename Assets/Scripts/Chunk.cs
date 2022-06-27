@@ -9,11 +9,11 @@ public class Chunk
     private readonly MaterialLoader materialLoader;
 
     private const int ChunkSize = 16;
-    private const int ChunkHeight = 16;
+    private const int ChunkHeight = 256;
 
     private readonly DataTypes.Block[,,] chunkData = new DataTypes.Block[ChunkSize, ChunkHeight, ChunkSize];
     private readonly Vector3Int chunkPosition;
-    
+
     public Chunk(MaterialLoader materialLoader, Vector3Int chunkPosition)
     {
         this.materialLoader = materialLoader;
@@ -22,7 +22,7 @@ public class Chunk
 
         for (var y = 0; y < ChunkHeight; y++)
         {
-            if (y >= 8) continue; // keep air
+            if (y >= 128) continue; // keep air
             for (var x = 0; x < ChunkSize; x++)
             {
                 for (var z = 0; z < ChunkSize; z++)
@@ -32,9 +32,9 @@ public class Chunk
             }
         }
 
-        chunkData[1, 8, 1] = DataTypes.Block.Grass;
-        chunkData[1, 12, 1] = DataTypes.Block.Grass;
-        chunkData[3, 15, 3] = DataTypes.Block.Grass;
+        chunkData[1, 128, 1] = DataTypes.Block.Grass;
+        chunkData[1, 130, 1] = DataTypes.Block.Grass;
+        chunkData[0, 134, 0] = DataTypes.Block.Grass;
     }
 
     // 0 --- 1
@@ -51,45 +51,43 @@ public class Chunk
         {DataTypes.BlockSide.Bottom, new Vector3[] {new(-1, -1, -1), new(1, -1, -1), new(1, -1, 1), new(-1, -1, 1)}},
     };
 
-    private void AddSquareToCubeMesh(ref Mesh mesh, Vector3Int blockPosition, DataTypes.Block block,
+    private class MeshAsLists
+    {
+        public List<Vector3> vertices;
+        public List<int> triangles;
+        public List<Vector2> uv;
+        public List<Color> colors;
+    }
+
+    private void AddSquareToCubeMesh(ref MeshAsLists mesh, Vector3Int blockPosition, DataTypes.Block block,
         DataTypes.BlockSide blockSide)
     {
         if (block == DataTypes.Block.Air) return;
 
-        var vertices = mesh.vertices.ToList();
-        var triangles = mesh.triangles.ToList();
-        var uv = mesh.uv.ToList();
-        var colors = mesh.colors.ToList();
-
         var sideVertices = SideVerts[blockSide];
         foreach (var index in new[] {0, 1, 2, 0, 2, 3})
         {
-            vertices.Add(sideVertices[index] * 0.5f + blockPosition);
-            triangles.Add(vertices.Count - 1);
+            mesh.vertices.Add(sideVertices[index] * 0.5f + blockPosition);
+            mesh.triangles.Add(mesh.vertices.Count - 1);
         }
 
         var blockSideUv = materialLoader.GetBlockSideUv(block, blockSide);
-        uv.Add(new Vector2(blockSideUv.xMin, blockSideUv.yMax));
-        uv.Add(new Vector2(blockSideUv.xMax, blockSideUv.yMax));
-        uv.Add(new Vector2(blockSideUv.xMax, blockSideUv.yMin));
-        uv.Add(new Vector2(blockSideUv.xMin, blockSideUv.yMax));
-        uv.Add(new Vector2(blockSideUv.xMax, blockSideUv.yMin));
-        uv.Add(new Vector2(blockSideUv.xMin, blockSideUv.yMin));
+        mesh.uv.Add(new Vector2(blockSideUv.xMin, blockSideUv.yMax));
+        mesh.uv.Add(new Vector2(blockSideUv.xMax, blockSideUv.yMax));
+        mesh.uv.Add(new Vector2(blockSideUv.xMax, blockSideUv.yMin));
+        mesh.uv.Add(new Vector2(blockSideUv.xMin, blockSideUv.yMax));
+        mesh.uv.Add(new Vector2(blockSideUv.xMax, blockSideUv.yMin));
+        mesh.uv.Add(new Vector2(blockSideUv.xMin, blockSideUv.yMin));
 
         // grass has vertex color 0,1,0 so that the shader can do grass things
         if (block == DataTypes.Block.Grass && blockSide != DataTypes.BlockSide.Bottom)
         {
-            colors.AddRange(new[] {Color.green, Color.green, Color.green, Color.green, Color.green, Color.green});
+            mesh.colors.AddRange(new[] {Color.green, Color.green, Color.green, Color.green, Color.green, Color.green});
         }
         else
         {
-            colors.AddRange(new[] {Color.black, Color.black, Color.black, Color.black, Color.black, Color.black});
+            mesh.colors.AddRange(new[] {Color.black, Color.black, Color.black, Color.black, Color.black, Color.black});
         }
-
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
-        mesh.uv = uv.ToArray();
-        mesh.colors = colors.ToArray();
     }
 
     private bool IsAirAroundBlock(Vector3Int position, DataTypes.BlockSide blockSide)
@@ -116,15 +114,23 @@ public class Chunk
 
     public void MakeChunkGameObject()
     {
-        var chunkGameObject = new GameObject($"Chunk{chunkPosition.x},{chunkPosition.y}")
+        var chunkGameObject = new GameObject($"Chunk{chunkPosition.x},{chunkPosition.z}")
         {
             transform =
             {
-                position = chunkPosition * ChunkSize
+                position = chunkPosition * ChunkSize + (new Vector3(-ChunkSize, -ChunkHeight, -ChunkSize) / 2f + new Vector3(0.5f, 0.5f, 0.5f))
             }
         };
 
         var mesh = new Mesh();
+
+        var meshAsLists = new MeshAsLists()
+        {
+            vertices = mesh.vertices.ToList(),
+            triangles = mesh.triangles.ToList(),
+            uv = mesh.uv.ToList(),
+            colors = mesh.colors.ToList(),
+        };
 
         for (var x = 0; x < ChunkSize; x++)
         {
@@ -136,30 +142,33 @@ public class Chunk
                     var block = chunkData[x, y, z];
 
                     if (IsAirAroundBlock(position, DataTypes.BlockSide.Front))
-                        AddSquareToCubeMesh(ref mesh, position, block, DataTypes.BlockSide.Front);
+                        AddSquareToCubeMesh(ref meshAsLists, position, block, DataTypes.BlockSide.Front);
                     if (IsAirAroundBlock(position, DataTypes.BlockSide.Back))
-                        AddSquareToCubeMesh(ref mesh, position, block, DataTypes.BlockSide.Back);
+                        AddSquareToCubeMesh(ref meshAsLists, position, block, DataTypes.BlockSide.Back);
                     if (IsAirAroundBlock(position, DataTypes.BlockSide.Left))
-                        AddSquareToCubeMesh(ref mesh, position, block, DataTypes.BlockSide.Left);
+                        AddSquareToCubeMesh(ref meshAsLists, position, block, DataTypes.BlockSide.Left);
                     if (IsAirAroundBlock(position, DataTypes.BlockSide.Right))
-                        AddSquareToCubeMesh(ref mesh, position, block, DataTypes.BlockSide.Right);
+                        AddSquareToCubeMesh(ref meshAsLists, position, block, DataTypes.BlockSide.Right);
                     if (IsAirAroundBlock(position, DataTypes.BlockSide.Top))
-                        AddSquareToCubeMesh(ref mesh, position, block, DataTypes.BlockSide.Top);
+                        AddSquareToCubeMesh(ref meshAsLists, position, block, DataTypes.BlockSide.Top);
                     if (IsAirAroundBlock(position, DataTypes.BlockSide.Bottom))
-                        AddSquareToCubeMesh(ref mesh, position, block, DataTypes.BlockSide.Bottom);
+                        AddSquareToCubeMesh(ref meshAsLists, position, block, DataTypes.BlockSide.Bottom);
                 }
             }
         }
-        
+
+        mesh.vertices = meshAsLists.vertices.ToArray();
+        mesh.triangles = meshAsLists.triangles.ToArray();
+        mesh.uv = meshAsLists.uv.ToArray();
+        mesh.colors = meshAsLists.colors.ToArray();
         mesh.Optimize();
 
         var meshRenderer = chunkGameObject.AddComponent<MeshRenderer>();
-        
+
         var atlasMaterial = materialLoader.GetAtlasMaterial();
         meshRenderer.material = atlasMaterial;
-        
+
         var meshFilter = chunkGameObject.AddComponent<MeshFilter>();
         meshFilter.mesh = mesh;
-
     }
 }
