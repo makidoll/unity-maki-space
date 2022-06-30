@@ -105,7 +105,7 @@ public class PlayerController : MonoBehaviour
 
         if (hitData.distance != 0)
         {
-            rigidbody.AddForce(Vector3.up * 500f);
+            rigidbody.AddForce(Vector3.up * 700f);
         }
     }
 
