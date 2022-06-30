@@ -32,6 +32,9 @@ public class PlayerController : MonoBehaviour
         inputActions.Player.Look.performed += OnLook;
         inputActions.Player.Look.Enable();
 
+        inputActions.Player.Jump.performed += OnJump;
+        inputActions.Player.Jump.Enable();
+
         inputActions.Player.Unfocus.performed += OnUnfocus;
         inputActions.Player.Unfocus.Enable();
 
@@ -92,6 +95,18 @@ public class PlayerController : MonoBehaviour
         cameraPitch = Mathf.Clamp(cameraPitch + -lookDelta.y * sensitivity, -90, 90);
         camera.transform.localEulerAngles = new Vector3(cameraPitch, camera.transform.localEulerAngles.y,
             camera.transform.localEulerAngles.z);
+    }
+
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        // move ray up slightly and check within -0.2 to 0.2
+        var ray = new Ray(transform.position + new Vector3(0, 0.2f, 0), Vector3.down);
+        Physics.Raycast(ray, out var hitData, 0.4f, LayerMask.GetMask("Chunk"));
+
+        if (hitData.distance != 0)
+        {
+            rigidbody.AddForce(Vector3.up * 500f);
+        }
     }
 
     private static void OnUnfocus(InputAction.CallbackContext context)
