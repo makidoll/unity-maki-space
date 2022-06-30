@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class ChunkSystem : MonoBehaviour
 {
@@ -17,7 +13,7 @@ public class ChunkSystem : MonoBehaviour
         return chunk;
     }
 
-    private void Awake()
+    private void Start()
     {
         for (var x = -2; x <= 2; x++)
         {

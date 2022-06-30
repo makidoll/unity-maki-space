@@ -194,6 +194,142 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""UI"",
+            ""id"": ""f10d1327-105b-48fb-b0ba-532f4263eb8e"",
+            ""actions"": [
+                {
+                    ""name"": ""InventoryScroll"",
+                    ""type"": ""Value"",
+                    ""id"": ""5ac17fab-fccd-4570-8205-b62a8efb605c"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""InventoryKey"",
+                    ""type"": ""Value"",
+                    ""id"": ""220a7eef-d72c-4f36-836b-b13d0b881d8d"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""232d692c-9281-4df9-8440-37c8f0aada8c"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""InventoryScroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""200d6ae2-b345-4087-ab9d-693d5687959b"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""InventoryKey"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f2a29612-adf5-465e-8df8-28b39f5cb933"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=2)"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""InventoryKey"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b414cc91-f8dd-4dc1-a8b1-f06aae36e4aa"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=3)"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""InventoryKey"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b4f52ab7-e09b-4a76-a597-08d61b2dacca"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=4)"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""InventoryKey"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""92872e9b-4adc-43b3-8302-6a641f5d780f"",
+                    ""path"": ""<Keyboard>/5"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=5)"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""InventoryKey"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dc4b3546-a4e8-4217-b21d-d18ec933c0b0"",
+                    ""path"": ""<Keyboard>/6"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=6)"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""InventoryKey"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bc92d37c-e9d8-4700-8f1d-84c635b6d66f"",
+                    ""path"": ""<Keyboard>/7"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=7)"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""InventoryKey"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f9d6ea38-d212-43cf-99b9-ccddf5e20d5c"",
+                    ""path"": ""<Keyboard>/8"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=8)"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""InventoryKey"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""51bb60bf-aa91-438d-9b09-a675881154c7"",
+                    ""path"": ""<Keyboard>/9"",
+                    ""interactions"": """",
+                    ""processors"": ""Scale(factor=9)"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""InventoryKey"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -267,6 +403,10 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         m_Player_Break = m_Player.FindAction("Break", throwIfNotFound: true);
         m_Player_Place = m_Player.FindAction("Place", throwIfNotFound: true);
         m_Player_Unfocus = m_Player.FindAction("Unfocus", throwIfNotFound: true);
+        // UI
+        m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
+        m_UI_InventoryScroll = m_UI.FindAction("InventoryScroll", throwIfNotFound: true);
+        m_UI_InventoryKey = m_UI.FindAction("InventoryKey", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -395,6 +535,47 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // UI
+    private readonly InputActionMap m_UI;
+    private IUIActions m_UIActionsCallbackInterface;
+    private readonly InputAction m_UI_InventoryScroll;
+    private readonly InputAction m_UI_InventoryKey;
+    public struct UIActions
+    {
+        private @InputActions m_Wrapper;
+        public UIActions(@InputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @InventoryScroll => m_Wrapper.m_UI_InventoryScroll;
+        public InputAction @InventoryKey => m_Wrapper.m_UI_InventoryKey;
+        public InputActionMap Get() { return m_Wrapper.m_UI; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(UIActions set) { return set.Get(); }
+        public void SetCallbacks(IUIActions instance)
+        {
+            if (m_Wrapper.m_UIActionsCallbackInterface != null)
+            {
+                @InventoryScroll.started -= m_Wrapper.m_UIActionsCallbackInterface.OnInventoryScroll;
+                @InventoryScroll.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnInventoryScroll;
+                @InventoryScroll.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnInventoryScroll;
+                @InventoryKey.started -= m_Wrapper.m_UIActionsCallbackInterface.OnInventoryKey;
+                @InventoryKey.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnInventoryKey;
+                @InventoryKey.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnInventoryKey;
+            }
+            m_Wrapper.m_UIActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @InventoryScroll.started += instance.OnInventoryScroll;
+                @InventoryScroll.performed += instance.OnInventoryScroll;
+                @InventoryScroll.canceled += instance.OnInventoryScroll;
+                @InventoryKey.started += instance.OnInventoryKey;
+                @InventoryKey.performed += instance.OnInventoryKey;
+                @InventoryKey.canceled += instance.OnInventoryKey;
+            }
+        }
+    }
+    public UIActions @UI => new UIActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -448,5 +629,10 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         void OnBreak(InputAction.CallbackContext context);
         void OnPlace(InputAction.CallbackContext context);
         void OnUnfocus(InputAction.CallbackContext context);
+    }
+    public interface IUIActions
+    {
+        void OnInventoryScroll(InputAction.CallbackContext context);
+        void OnInventoryKey(InputAction.CallbackContext context);
     }
 }
