@@ -8,18 +8,20 @@ using UnityEngine;
 public class TextureManager
 {
     private readonly ZipArchive archive;
-    private readonly Dictionary<string, Texture2D> loadedTextures = new();
     
+    private readonly Dictionary<string, Texture2D> loadedTextures = new();
+    private readonly Dictionary<string, Sprite> loadedSprites = new();
+
     public Texture2D GetTexture(string texturePath)
     {
         if (loadedTextures.ContainsKey(texturePath)) return loadedTextures[texturePath];
-
+        
         var entry = archive.Entries.First(entry => entry.FullName == texturePath);
         var stream = entry.Open();
         var memoryStream = new MemoryStream();
         stream.CopyTo(memoryStream);
         stream.Close();
-
+        
         var texture = new Texture2D(1, 1);
         texture.LoadImage(memoryStream.ToArray());
         texture.filterMode = FilterMode.Point;
@@ -27,6 +29,35 @@ public class TextureManager
         loadedTextures[texturePath] = texture;
 
         return texture;
+    }
+
+    // public Texture2D GetCroppedTexture(string texturePath, RectInt rect)
+    // {
+    //     var texturePathWithCrop = $"{texturePath} {rect.width}x{rect.height}+{rect.x}+{rect.y}";
+    //     if (loadedTextures.ContainsKey(texturePathWithCrop)) return loadedTextures[texturePathWithCrop];
+    //     
+    //     var uncroppedTexture = GetTexture(texturePath);
+    //     var pixels = uncroppedTexture.GetPixels(rect.x, rect.y, rect.width, rect.height);
+    //
+    //     var texture = new Texture2D(rect.width, rect.height);
+    //     texture.SetPixels(pixels);
+    //     texture.filterMode = FilterMode.Point;
+    //
+    //     loadedTextures[texturePathWithCrop] = texture;
+    //
+    //     return texture;
+    // }
+    
+    public Sprite GetCroppedSprite(string texturePath, Rect rect)
+    {
+        var texturePathWithCrop = $"{texturePath} {rect.width}x{rect.height}+{rect.x}+{rect.y}";
+        if (loadedSprites.ContainsKey(texturePathWithCrop)) return loadedSprites[texturePathWithCrop];
+
+        var sprite = Sprite.Create(GetTexture(texturePath), rect, new Vector2(0.5f, 0.5f));
+
+        loadedSprites[texturePathWithCrop] = sprite;
+
+        return sprite;
     }
 
     public TextureManager()
