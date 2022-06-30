@@ -5,7 +5,6 @@ using UnityEngine;
 public class Chunk
 {
     private readonly ChunkSystem chunkSystem;
-    private readonly MaterialLoader materialLoader;
 
     private bool chunkGameObjectLoaded;
     private MeshFilter meshFilter;
@@ -17,10 +16,9 @@ public class Chunk
     private readonly DataTypes.Block[,,] chunkData = new DataTypes.Block[ChunkSize, ChunkHeight, ChunkSize];
     private readonly Vector3Int chunkPosition;
 
-    public Chunk(ChunkSystem chunkSystem, MaterialLoader materialLoader, Vector3Int chunkPosition)
+    public Chunk(ChunkSystem chunkSystem, Vector3Int chunkPosition)
     {
         this.chunkSystem = chunkSystem;
-        this.materialLoader = materialLoader;
 
         this.chunkPosition = chunkPosition;
         this.chunkPosition.y = 0;
@@ -95,8 +93,8 @@ public class Chunk
             mesh.triangles.Add(mesh.vertices.Count - 1);
             mesh.normals.Add(SideNormals[blockSide]);
         }
-
-        var blockSideUv = materialLoader.GetBlockSideUv(block, blockSide);
+        
+        var blockSideUv = DependencyManager.Instance.ChunkMaterialManager.GetBlockSideUv(block, blockSide);
         mesh.uv.Add(new Vector2(blockSideUv.xMin, blockSideUv.yMax));
         mesh.uv.Add(new Vector2(blockSideUv.xMax, blockSideUv.yMax));
         mesh.uv.Add(new Vector2(blockSideUv.xMax, blockSideUv.yMin));
@@ -169,8 +167,8 @@ public class Chunk
         };
 
         var meshRenderer = chunkGameObject.AddComponent<MeshRenderer>();
-
-        var atlasMaterial = materialLoader.GetAtlasMaterial();
+       
+        var atlasMaterial = DependencyManager.Instance.ChunkMaterialManager.GetAtlasMaterial();
         meshRenderer.material = atlasMaterial;
 
         meshFilter = chunkGameObject.AddComponent<MeshFilter>();

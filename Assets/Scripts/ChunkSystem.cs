@@ -7,21 +7,18 @@ using UnityEngine.UIElements;
 
 public class ChunkSystem : MonoBehaviour
 {
-    private MaterialLoader materialLoader;
-
     private Dictionary<Vector3Int, Chunk> chunks = new();
 
     public Chunk GetChunk(Vector3Int position)
     {
         if (chunks.ContainsKey(position)) return chunks[position];
-        var chunk = new Chunk(this, materialLoader, position);
+        var chunk = new Chunk(this, position);
         chunks[position] = chunk;
         return chunk;
     }
 
     private void Awake()
     {
-        materialLoader = new MaterialLoader();
         for (var x = -2; x <= 2; x++)
         {
             for (var z = -2; z <= 2; z++)
