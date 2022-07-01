@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,6 +18,9 @@ public class PlayerController : MonoBehaviour
     private Vector3Int placePosition;
     private Vector3Int destroyPosition;
     public GameObject selectionCube;
+
+    public GameObject breakBlockParticlesPrefab;
+    private List<ParticleSystem> aliveParticleSystems = new();
 
     private void Awake()
     {
@@ -83,6 +88,16 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        for (var i = aliveParticleSystems.Count - 1; i >= 0; i--)
+        {
+            if (aliveParticleSystems[i].IsAlive()) continue;
+            Destroy(aliveParticleSystems[i].gameObject);
+            aliveParticleSystems.RemoveAt(i);
+        }
+    }
+
     private void OnLook(InputAction.CallbackContext context)
     {
         if (Cursor.lockState != CursorLockMode.Locked) return;
@@ -125,6 +140,9 @@ public class PlayerController : MonoBehaviour
         if (!highlightingBlock) return;
 
         chunkSystem.SetBlock(destroyPosition, DataTypes.Block.Air);
+        
+        var particlesGameObject = Instantiate(breakBlockParticlesPrefab, destroyPosition, Quaternion.identity);
+        aliveParticleSystems.Add(particlesGameObject.GetComponent<ParticleSystem>());
     }
     
     private void OnPlace(InputAction.CallbackContext context)
