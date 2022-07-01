@@ -47,7 +47,7 @@ public class ChunkMaterialManager
         // should be 16 but you never know right
         textureSize = sampleDirtTexture.width;
 
-        atlasTexture = new Texture2D(AtlasWidth * textureSize, AtlasHeight * textureSize)
+        atlasTexture = new Texture2D(AtlasWidth * textureSize, AtlasHeight * textureSize, TextureFormat.RGB24, false)
         {
             filterMode = FilterMode.Point
         };
@@ -75,14 +75,6 @@ public class ChunkMaterialManager
     public Material GetAtlasMaterial()
     {
         return atlasMaterial;
-    }
-
-    private enum Rotation
-    {
-        Deg0 = 0,
-        Deg90 = 90,
-        Deg180 = 180,
-        Deg270 = 270,
     }
 
     private static Vector2 Rotate(Vector2 point, Vector2 pivot, float deg)
