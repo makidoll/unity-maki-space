@@ -39,9 +39,10 @@ public class Chunk
                         planeWorldPos.y * noiseScale
                     ) * (noiseHeight + 1f)
                 );
+                
                 for (var y = 0; y < height; y++)
                 {
-                    chunkData[x, y, z] = DataTypes.Block.Grass;
+                    chunkData[x, y, z] = y == height - 1 ? DataTypes.Block.Grass : DataTypes.Block.Dirt;
                 }
             }
         }

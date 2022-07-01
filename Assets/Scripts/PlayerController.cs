@@ -73,11 +73,11 @@ public class PlayerController : MonoBehaviour
         }
 
         selectionCube.SetActive(highlightingBlock);
-        
+
         // everything onward is only when mouse locked
 
         if (!Application.isFocused || Cursor.lockState != CursorLockMode.Locked) return;
-        
+
         var moveXy = inputActions.Player.Move.ReadValue<Vector2>();
         if (moveXy != Vector2.zero)
         {
@@ -101,7 +101,7 @@ public class PlayerController : MonoBehaviour
     private void OnLook(InputAction.CallbackContext context)
     {
         if (!Application.isFocused || Cursor.lockState != CursorLockMode.Locked) return;
-        
+
         const float sensitivity = 0.125f;
 
         var lookDelta = context.ReadValue<Vector2>();
@@ -132,7 +132,7 @@ public class PlayerController : MonoBehaviour
     private void OnBreak(InputAction.CallbackContext context)
     {
         if (!Application.isFocused) return;
-        
+
         if (Cursor.lockState != CursorLockMode.Locked)
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -141,12 +141,17 @@ public class PlayerController : MonoBehaviour
 
         if (!highlightingBlock) return;
 
+        var breakingBlock = chunkSystem.GetBlock(destroyPosition);
+
         chunkSystem.SetBlock(destroyPosition, DataTypes.Block.Air);
-        
+
         var particlesGameObject = Instantiate(breakBlockParticlesPrefab, destroyPosition, Quaternion.identity);
+        particlesGameObject.GetComponent<ParticleSystemRenderer>().material =
+            DependencyManager.Instance.ChunkMaterialManager.GetBreakParticleTexture(breakingBlock);
+
         aliveParticleSystems.Add(particlesGameObject.GetComponent<ParticleSystem>());
     }
-    
+
     private void OnPlace(InputAction.CallbackContext context)
     {
         if (!Application.isFocused || Cursor.lockState != CursorLockMode.Locked) return;

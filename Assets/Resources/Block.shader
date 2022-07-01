@@ -1,4 +1,4 @@
-Shader "Maki/Minecraft"
+Shader "Maki/Block"
 {
     Properties
     {

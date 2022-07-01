@@ -14,6 +14,8 @@ public class ChunkMaterialManager
     private readonly Material atlasMaterial;
     private readonly Dictionary<string, Vector2Int> atlasTexturePositions = new();
 
+    private readonly Dictionary<DataTypes.Block, Material> breakParticleMaterials = new();
+
     public ChunkMaterialManager()
     {
         // get all required textures
@@ -64,7 +66,7 @@ public class ChunkMaterialManager
 
         // make material
 
-        atlasMaterial = new Material(Shader.Find("Maki/Minecraft"))
+        atlasMaterial = new Material(Shader.Find("Maki/Block"))
         {
             mainTexture = atlasTexture
         };
@@ -134,5 +136,23 @@ public class ChunkMaterialManager
         }
 
         return uvCoords;
+    }
+
+    public Material GetBreakParticleTexture(DataTypes.Block block)
+    {
+        if (breakParticleMaterials.ContainsKey(block)) return breakParticleMaterials[block];
+
+        var blockTextures = DataTypes.AllBlockInfo[block].Textures;
+        if (blockTextures == null) return null;
+
+        var material = new Material(Shader.Find("Maki/Break Particle"))
+        {
+            mainTexture =
+                DependencyManager.Instance.TextureManager.GetTexture(blockTextures[DataTypes.BlockSide.Top].path)
+        };
+
+        breakParticleMaterials[block] = material;
+
+        return material;
     }
 }
