@@ -12,35 +12,63 @@ public static class DataTypes
         Bottom
     }
 
-    public enum Block
+    public record BlockTexture
     {
-        Air, // must be first
-        Grass,
-        Dirt,
+        public string path;
+        public bool rotate;
     }
 
-    public static readonly Dictionary<Block, Dictionary<BlockSide, string>> BlockSideTextureNames = new()
+    public record BlockInfo
+    {
+        public string Name;
+        public Dictionary<BlockSide, BlockTexture> Textures;
+    }
+
+    private const string TexturesBlockPath = "assets/minecraft/textures/block/";
+
+    public enum Block
+    {
+        Air,
+        Grass,
+        Dirt
+    }
+
+    public static readonly Dictionary<Block, BlockInfo> AllBlockInfo = new()
     {
         {
-            Block.Grass, new Dictionary<BlockSide, string>
+            Block.Air, new BlockInfo
             {
-                {BlockSide.Top, "assets/minecraft/textures/block/grass_block_top.png"},
-                {BlockSide.Left, "assets/minecraft/textures/block/grass_block_side.png"},
-                {BlockSide.Right, "assets/minecraft/textures/block/grass_block_side.png"},
-                {BlockSide.Front, "assets/minecraft/textures/block/grass_block_side.png"},
-                {BlockSide.Back, "assets/minecraft/textures/block/grass_block_side.png"},
-                {BlockSide.Bottom, "assets/minecraft/textures/block/dirt.png"},
+                Name = "Air",
             }
         },
         {
-            Block.Dirt, new Dictionary<BlockSide, string>
+            Block.Grass, new BlockInfo
             {
-                {BlockSide.Top, "assets/minecraft/textures/block/dirt.png"},
-                {BlockSide.Left, "assets/minecraft/textures/block/dirt.png"},
-                {BlockSide.Right, "assets/minecraft/textures/block/dirt.png"},
-                {BlockSide.Front, "assets/minecraft/textures/block/dirt.png"},
-                {BlockSide.Back, "assets/minecraft/textures/block/dirt.png"},
-                {BlockSide.Bottom, "assets/minecraft/textures/block/dirt.png"},
+                Name = "Grass",
+                Textures = new Dictionary<BlockSide, BlockTexture>
+                {
+                    {BlockSide.Top, new() {path = TexturesBlockPath + "grass_block_top.png", rotate = true}},
+                    {BlockSide.Left, new() {path = TexturesBlockPath + "grass_block_side.png", rotate = false}},
+                    {BlockSide.Right, new() {path = TexturesBlockPath + "grass_block_side.png", rotate = false}},
+                    {BlockSide.Front, new() {path = TexturesBlockPath + "grass_block_side.png", rotate = false}},
+                    {BlockSide.Back, new() {path = TexturesBlockPath + "grass_block_side.png", rotate = false}},
+                    {BlockSide.Bottom, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
+                }
+            }
+        },
+        {
+            Block.Dirt, new BlockInfo
+            {
+                Name = "Dirt",
+                Textures = new Dictionary<BlockSide, BlockTexture>
+                {
+                    {BlockSide.Top, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
+                    {BlockSide.Left, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
+                    {BlockSide.Right, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
+                    {BlockSide.Front, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
+                    {BlockSide.Back, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
+                    {BlockSide.Bottom, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
+                }
             }
         }
     };

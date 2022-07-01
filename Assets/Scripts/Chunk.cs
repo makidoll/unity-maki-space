@@ -94,13 +94,14 @@ public class Chunk
             mesh.normals.Add(SideNormals[blockSide]);
         }
         
+        // 4 clockwise coords 
         var blockSideUv = DependencyManager.Instance.ChunkMaterialManager.GetBlockSideUv(block, blockSide);
-        mesh.uv.Add(new Vector2(blockSideUv.xMin, blockSideUv.yMax));
-        mesh.uv.Add(new Vector2(blockSideUv.xMax, blockSideUv.yMax));
-        mesh.uv.Add(new Vector2(blockSideUv.xMax, blockSideUv.yMin));
-        mesh.uv.Add(new Vector2(blockSideUv.xMin, blockSideUv.yMax));
-        mesh.uv.Add(new Vector2(blockSideUv.xMax, blockSideUv.yMin));
-        mesh.uv.Add(new Vector2(blockSideUv.xMin, blockSideUv.yMin));
+        mesh.uv.Add(blockSideUv[0]);
+        mesh.uv.Add(blockSideUv[1]);
+        mesh.uv.Add(blockSideUv[2]);
+        mesh.uv.Add(blockSideUv[0]);
+        mesh.uv.Add(blockSideUv[2]);
+        mesh.uv.Add(blockSideUv[3]);
 
         // grass has vertex color 0,1,0 so that the shader can do grass things
         if (block == DataTypes.Block.Grass && blockSide != DataTypes.BlockSide.Bottom)
