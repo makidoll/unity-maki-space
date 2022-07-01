@@ -98,7 +98,7 @@ public class PlayerUI : MonoBehaviour
         if (Cursor.lockState != CursorLockMode.Locked) return;
         
         var scrollUp = context.ReadValue<float>() > 0;
-        inventorySelectionPosition = scrollUp ? inventorySelectionPosition + 1 : inventorySelectionPosition - 1;
+        inventorySelectionPosition = scrollUp ? inventorySelectionPosition - 1 : inventorySelectionPosition + 1;
         if (inventorySelectionPosition > 8) inventorySelectionPosition = 0;
         if (inventorySelectionPosition < 0) inventorySelectionPosition = 8;
         UpdateInventorySelection();
