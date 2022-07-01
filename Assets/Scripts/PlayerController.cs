@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         var ray = new Ray(camera.transform.position, camera.transform.forward);
-        Physics.Raycast(ray, out var hitData, 4f, LayerMask.GetMask("Chunk"));
+        Physics.Raycast(ray, out var hitData, 4.5f, LayerMask.GetMask("Chunk"));
 
         highlightingBlock = hitData.distance != 0;
 
