@@ -75,8 +75,8 @@ public class PlayerController : MonoBehaviour
         selectionCube.SetActive(highlightingBlock);
         
         // everything onward is only when mouse locked
-        
-        if (Cursor.lockState != CursorLockMode.Locked) return;
+
+        if (!Application.isFocused || Cursor.lockState != CursorLockMode.Locked) return;
         
         var moveXy = inputActions.Player.Move.ReadValue<Vector2>();
         if (moveXy != Vector2.zero)
@@ -100,7 +100,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnLook(InputAction.CallbackContext context)
     {
-        if (Cursor.lockState != CursorLockMode.Locked) return;
+        if (!Application.isFocused || Cursor.lockState != CursorLockMode.Locked) return;
         
         const float sensitivity = 0.125f;
 
@@ -131,6 +131,8 @@ public class PlayerController : MonoBehaviour
 
     private void OnBreak(InputAction.CallbackContext context)
     {
+        if (!Application.isFocused) return;
+        
         if (Cursor.lockState != CursorLockMode.Locked)
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -147,7 +149,7 @@ public class PlayerController : MonoBehaviour
     
     private void OnPlace(InputAction.CallbackContext context)
     {
-        if (Cursor.lockState != CursorLockMode.Locked) return;
+        if (!Application.isFocused || Cursor.lockState != CursorLockMode.Locked) return;
 
         if (!highlightingBlock) return;
 

@@ -95,8 +95,8 @@ public class PlayerUI : MonoBehaviour
 
     private void OnInventoryScroll(InputAction.CallbackContext context)
     {
-        if (Cursor.lockState != CursorLockMode.Locked) return;
-        
+        if (!Application.isFocused || Cursor.lockState != CursorLockMode.Locked) return;
+
         var scrollUp = context.ReadValue<float>() > 0;
         inventorySelectionPosition = scrollUp ? inventorySelectionPosition - 1 : inventorySelectionPosition + 1;
         if (inventorySelectionPosition > 8) inventorySelectionPosition = 0;
@@ -106,7 +106,7 @@ public class PlayerUI : MonoBehaviour
     
     private void OnInventoryKey(InputAction.CallbackContext context)
     {
-        if (Cursor.lockState != CursorLockMode.Locked) return;
+        if (!Application.isFocused || Cursor.lockState != CursorLockMode.Locked) return;
 
         inventorySelectionPosition = (int) Mathf.Floor(context.ReadValue<float>()) - 1;
         if (inventorySelectionPosition > 8) inventorySelectionPosition = 8;
