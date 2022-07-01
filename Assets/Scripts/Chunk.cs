@@ -23,12 +23,23 @@ public class Chunk
         this.chunkPosition = chunkPosition;
         this.chunkPosition.y = 0;
 
-        for (var y = 0; y < ChunkHeight; y++)
+        const int tallestHeight = 128;
+        const float noiseScale = 1 / 20f;
+        const float noiseHeight = 4f;
+
+        for (var x = 0; x < ChunkSize; x++)
         {
-            if (y >= 128 + chunkPosition.z + chunkPosition.x) continue; // keep air
-            for (var x = 0; x < ChunkSize; x++)
+            for (var z = 0; z < ChunkSize; z++)
             {
-                for (var z = 0; z < ChunkSize; z++)
+                var planeWorldPos = new Vector2Int(chunkPosition.x, chunkPosition.z) * ChunkSize + new Vector2Int(x, z);
+
+                var height = tallestHeight - Mathf.FloorToInt(
+                    Mathf.PerlinNoise(
+                        planeWorldPos.x * noiseScale,
+                        planeWorldPos.y * noiseScale
+                    ) * (noiseHeight + 1f)
+                );
+                for (var y = 0; y < height; y++)
                 {
                     chunkData[x, y, z] = DataTypes.Block.Grass;
                 }
@@ -93,7 +104,7 @@ public class Chunk
             mesh.triangles.Add(mesh.vertices.Count - 1);
             mesh.normals.Add(SideNormals[blockSide]);
         }
-        
+
         // 4 clockwise coords 
         var blockSideUv = DependencyManager.Instance.ChunkMaterialManager.GetBlockSideUv(block, blockSide);
         mesh.uv.Add(blockSideUv[0]);
@@ -136,22 +147,24 @@ public class Chunk
         {
             case < 0:
                 return chunkSystem.GetChunk(chunkPosition + queryOffset)
-                    .GetBlock(new Vector3Int(edge, blockPositionInChunk.y, blockPositionInChunk.z)) == DataTypes.Block.Air;
+                           .GetBlock(new Vector3Int(edge, blockPositionInChunk.y, blockPositionInChunk.z)) ==
+                       DataTypes.Block.Air;
             case > edge:
                 return chunkSystem.GetChunk(chunkPosition + queryOffset)
                     .GetBlock(new Vector3Int(0, blockPositionInChunk.y, blockPositionInChunk.z)) == DataTypes.Block.Air;
         }
-        
+
         switch (queryPositionInChunk.z)
         {
             case < 0:
                 return chunkSystem.GetChunk(chunkPosition + queryOffset)
-                    .GetBlock(new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, edge)) == DataTypes.Block.Air;
+                           .GetBlock(new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, edge)) ==
+                       DataTypes.Block.Air;
             case > edge:
                 return chunkSystem.GetChunk(chunkPosition + queryOffset)
                     .GetBlock(new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, 0)) == DataTypes.Block.Air;
         }
-        
+
         var queryBlock = chunkData[queryPositionInChunk.x, queryPositionInChunk.y, queryPositionInChunk.z];
         return queryBlock == DataTypes.Block.Air;
     }
@@ -168,7 +181,7 @@ public class Chunk
         };
 
         var meshRenderer = chunkGameObject.AddComponent<MeshRenderer>();
-       
+
         var atlasMaterial = DependencyManager.Instance.ChunkMaterialManager.GetAtlasMaterial();
         meshRenderer.material = atlasMaterial;
 
