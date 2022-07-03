@@ -92,14 +92,14 @@ public class ChunkMaterialManager
         return uvCoords.Select(point => Rotate(point, pivot, deg)).ToArray();
     }
 
-    public Vector2[] GetBlockSideUv(DataTypes.Block block, DataTypes.BlockSide blockSide)
+    public Vector2[] GetBlockSideUv(Block block, DataTypes.BlockSide blockSide)
     {
-        if (!DataTypes.AllBlockInfo.ContainsKey(block))
+        if (!DataTypes.AllBlockInfo.ContainsKey(block.block))
         {
             return new[] {Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero};
         }
 
-        var texture = DataTypes.AllBlockInfo[block].Textures[blockSide];
+        var texture = DataTypes.AllBlockInfo[block.block].Textures[blockSide];
         var coords = atlasTexturePositions[texture.path];
 
         var position = coords / new Vector2(AtlasWidth, AtlasHeight);
@@ -123,7 +123,7 @@ public class ChunkMaterialManager
         {
             uvCoords = RotateUvCoords(
                 uvCoords, position + new Vector2(width, height) * 0.5f,
-                Random.Range(0, 3) * 90
+                block.blockSideRotations == null ? 0 : block.blockSideRotations[blockSide] * 90
             );
         }
 
