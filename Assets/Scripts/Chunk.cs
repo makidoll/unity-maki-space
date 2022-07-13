@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -15,6 +16,8 @@ public class Chunk
 
     private readonly Block[,,] chunkData = new Block[ChunkSize, ChunkHeight, ChunkSize];
     private readonly Vector3Int chunkPosition;
+
+    public bool needMeshGen = true;
 
     public Chunk(ChunkSystem chunkSystem, Vector3Int chunkPosition)
     {
@@ -101,7 +104,7 @@ public class Chunk
         public List<Color> colors;
     }
 
-    private void AddSquareToCubeMesh(ref MeshAsLists mesh, Vector3Int blockPosition, Block block,
+    private static void AddSquareToCubeMesh(ref MeshAsLists mesh, Vector3Int blockPosition, Block block,
         DataTypes.BlockSide blockSide)
     {
         if (block.block == DataTypes.Block.Air) return;
@@ -209,9 +212,11 @@ public class Chunk
         chunkGameObjectLoaded = true;
     }
 
-    public void GenerateMesh()
+    public void UpdateMeshGen()
     {
-        if (!chunkGameObjectLoaded) return;
+        if (!needMeshGen) return;
+        
+        if (!chunkGameObjectLoaded) MakeChunkGameObject();
 
         var mesh = new Mesh();
 
@@ -258,5 +263,7 @@ public class Chunk
 
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
+
+        needMeshGen = false;
     }
 }

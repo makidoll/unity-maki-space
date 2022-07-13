@@ -160,4 +160,10 @@ public class PlayerController : MonoBehaviour
 
         chunkSystem.SetBlock(placePosition, new Block(DataTypes.Block.Grass));
     }
+
+    public Vector3Int GetChunkPosition()
+    {
+        return new Vector3Int(Mathf.FloorToInt((float) gameObject.transform.position.x / Chunk.ChunkSize), 0,
+            Mathf.FloorToInt((float) gameObject.transform.position.z / Chunk.ChunkSize));
+    }
 }

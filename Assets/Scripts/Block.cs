@@ -2,16 +2,17 @@
 using System.Linq;
 using UnityEngine;
 
-public class Block
+public struct Block
 {
     public readonly DataTypes.Block block;
 
-    // 0, 1, 2, 3
+    // int is either 0, 1, 2, 3
     public readonly Dictionary<DataTypes.BlockSide, int> blockSideRotations;
 
-    public Block(DataTypes.Block block)
+    public Block(DataTypes.Block blockToSet)
     {
-        this.block = block;
+        block = blockToSet;
+        blockSideRotations = null;
 
         var textures = DataTypes.AllBlockInfo[block].Textures;
         if (textures == null) return;
