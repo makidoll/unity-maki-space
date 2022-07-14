@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | maki-space</title>
+  </head>
+  <body style="text-align: center">
+    <canvas id="unity-canvas" width=1280 height=720 style="width: 1280px; height: 720px; background: url('Build/08e0fa6e3783ea11b10359b5122f74f6.jpg') center / cover"></canvas>
+    <script src="Build/unity-maki-space-gh-pages.loader.js"></script>
+    <script>
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+      }
+
+      createUnityInstance(document.querySelector("#unity-canvas"), {
+        dataUrl: "Build/e7ae387e52fb53699374328009dd76c0.data",
+        frameworkUrl: "Build/1676c9c0eaf3713e088de5b1f6976d57.js",
+        codeUrl: "Build/fafeb8754c3a64c857b0633b195ec6e8.wasm",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "Maki",
+        productName: "maki-space",
+        productVersion: "0.1",
+        // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
+        // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
+      });
+    </script>
+  </body>
+</html>
