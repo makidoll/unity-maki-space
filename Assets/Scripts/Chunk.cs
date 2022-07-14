@@ -7,7 +7,9 @@ public class Chunk
 {
     private readonly ChunkSystem chunkSystem;
 
+    private GameObject chunkGameObject;
     private bool chunkGameObjectLoaded;
+    
     private MeshFilter meshFilter;
     private MeshCollider meshCollider;
 
@@ -15,7 +17,7 @@ public class Chunk
     public const int ChunkHeight = 256;
 
     private readonly DataTypes.Block[,,] chunkData = new DataTypes.Block[ChunkSize, ChunkHeight, ChunkSize];
-    private readonly Vector3Int chunkPosition;
+    public readonly Vector3Int chunkPosition;
 
     public bool needMeshGen = true;
 
@@ -189,7 +191,7 @@ public class Chunk
 
     public void MakeChunkGameObject()
     {
-        var chunkGameObject = new GameObject($"Chunk{chunkPosition.x},{chunkPosition.z}")
+        chunkGameObject = new GameObject($"Chunk{chunkPosition.x},{chunkPosition.z}")
         {
             transform =
             {
@@ -197,6 +199,8 @@ public class Chunk
             },
             layer = LayerMask.NameToLayer("Chunk")
         };
+
+        chunkSystem.chunksWithGameObjects.Add(this);
 
         var meshRenderer = chunkGameObject.AddComponent<MeshRenderer>();
 
@@ -269,5 +273,12 @@ public class Chunk
         meshCollider.sharedMesh = mesh;
 
         needMeshGen = false;
+    }
+
+    public void RemoveGameObject()
+    {
+        Object.Destroy(chunkGameObject);
+        chunkGameObjectLoaded = false;
+        needMeshGen = true;
     }
 }

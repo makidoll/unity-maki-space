@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using UnityEngine;
 
 public class ChunkSystem : MonoBehaviour
 {
     private Dictionary<Vector3Int, Chunk> chunks = new();
+    public List<Chunk> chunksWithGameObjects = new();
 
     public PlayerController playerController;
 
@@ -17,40 +19,56 @@ public class ChunkSystem : MonoBehaviour
     }
 
     [CanBeNull]
-    private Chunk GetClosestChunkWithoutMeshNearPlayer()
+    private List<(float, Chunk)> GetClosestChunksNearPlayer()
     {
         var playerChunkPosition = playerController.GetChunkPosition();
         
-        const int viewDistance = 2;
+        const int viewDistance = 8;
 
-        Chunk currentClosestChunk = null;
-        float currentClosestChunkDistance = 999;
+        List<(float, Chunk)> closestChunks = new();
             
         for (var deltaZ = -viewDistance; deltaZ <= viewDistance; deltaZ++)
         {
             for (var deltaX = -viewDistance; deltaX <= viewDistance; deltaX++)
             {
                 var chunkPosition = playerChunkPosition + new Vector3Int(deltaX, 0, deltaZ);
-                
                 var chunk = GetChunk(chunkPosition);
-                if (!chunk.needMeshGen) continue;
                 
                 var distance = Vector3Int.Distance(playerChunkPosition, chunkPosition);
-                if (distance > viewDistance || distance > currentClosestChunkDistance) continue;
+                if (distance > viewDistance) continue;
                 
-                currentClosestChunk = chunk;
-                currentClosestChunkDistance = distance;
+                closestChunks.Add((distance, chunk));
             }
         }
 
-        return currentClosestChunk;
+        return closestChunks;
+    }
+
+    private void FilterChunksWithGameObjects(ICollection<Chunk> chunksToKeep)
+    {
+        foreach (var chunk in chunksWithGameObjects)
+        {
+            if (chunksToKeep.Contains(chunk)) continue;
+            chunk.RemoveGameObject();
+        }
     }
 
     private void LateUpdate()
     {
-        var closestChunk = GetClosestChunkWithoutMeshNearPlayer();
-        closestChunk?.UpdateMeshGen();
-        // will wait till next frame to do the next chunk
+        var closestChunks = GetClosestChunksNearPlayer();
+        if (closestChunks == null) return;
+        
+        // delete chunks that arent close by
+        FilterChunksWithGameObjects(closestChunks.Select(c => c.Item2).ToArray());
+
+        // sort with closest first
+        closestChunks.Sort((a, b) => a.Item1.CompareTo(b.Item1));        
+        foreach (var (_, chunk) in closestChunks)
+        {
+            if (!chunk.needMeshGen) continue;
+            chunk.UpdateMeshGen();
+            break; // wait till next frame to do the next chunk
+        }
     }
 
     private static int GlslMod(int x, int m)
