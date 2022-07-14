@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
     public GameObject breakBlockParticlesPrefab;
     private List<ParticleSystem> aliveParticleSystems = new();
 
+    public Animator animator;
+
     private void Awake()
     {
         camera = GetComponentInChildren<Camera>();
@@ -79,12 +81,18 @@ public class PlayerController : MonoBehaviour
         if (!Application.isFocused || Cursor.lockState != CursorLockMode.Locked) return;
 
         var moveXy = inputActions.Player.Move.ReadValue<Vector2>();
-        if (moveXy != Vector2.zero)
+        if (moveXy == Vector2.zero)
+        {
+            animator.Play("Idle");
+        }
+        else
         {
             var positionOffset = Quaternion.Euler(0, transform.localEulerAngles.y, 0) *
                                  new Vector3(moveXy.x, 0, moveXy.y);
 
             rigidbody.MovePosition(transform.position + positionOffset * 0.1f);
+            
+            animator.Play("Walk");
         }
     }
 
