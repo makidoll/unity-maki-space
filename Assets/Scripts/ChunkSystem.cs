@@ -73,10 +73,10 @@ public class ChunkSystem : MonoBehaviour
         return (chunk, blockPosition);
     }
 
-    public Block GetBlock(Vector3Int worldPosition)
+    public DataTypes.Block GetBlock(Vector3Int worldPosition)
     {
         var chunkAndPosition = WorldSpaceToChunkPosition(worldPosition);
-        if (chunkAndPosition == null) return new Block(DataTypes.Block.Air);
+        if (chunkAndPosition == null) return DataTypes.Block.Air;
 
         var chunk = chunkAndPosition.Value.Item1;
         var position = chunkAndPosition.Value.Item2;
@@ -90,7 +90,7 @@ public class ChunkSystem : MonoBehaviour
         chunkAndPosition.Value.Item1.needMeshGen = true;
     }
     
-    public void SetBlock(Vector3Int worldPosition, Block block)
+    public void SetBlock(Vector3Int worldPosition, DataTypes.Block block)
     {
         var chunkAndPosition = WorldSpaceToChunkPosition(worldPosition);
         if (chunkAndPosition == null) return;

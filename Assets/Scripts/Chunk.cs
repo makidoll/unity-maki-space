@@ -14,7 +14,7 @@ public class Chunk
     public const int ChunkSize = 16;
     public const int ChunkHeight = 256;
 
-    private readonly Block[,,] chunkData = new Block[ChunkSize, ChunkHeight, ChunkSize];
+    private readonly DataTypes.Block[,,] chunkData = new DataTypes.Block[ChunkSize, ChunkHeight, ChunkSize];
     private readonly Vector3Int chunkPosition;
 
     public bool needMeshGen = true;
@@ -48,26 +48,26 @@ public class Chunk
                     if (y < height)
                     {
                         chunkData[x, y, z] =
-                            y == height - 1 ? new Block(DataTypes.Block.Grass) : new Block(DataTypes.Block.Dirt);
+                            y == height - 1 ? DataTypes.Block.Grass : DataTypes.Block.Dirt;
                     }
                     else
                     {
-                        chunkData[x, y, z] = new Block(DataTypes.Block.Air);
+                        chunkData[x, y, z] = DataTypes.Block.Air;
                     }
                 }
             }
         }
     }
 
-    public void SetBlock(Vector3Int positionInChunk, Block block)
+    public void SetBlock(Vector3Int positionInChunk, DataTypes.Block block)
     {
         chunkData[positionInChunk.x, positionInChunk.y, positionInChunk.z] = block;
     }
 
-    public Block GetBlock(Vector3Int positionInChunk)
+    public DataTypes.Block GetBlock(Vector3Int positionInChunk)
     {
         if (positionInChunk.x is < 0 or > ChunkSize - 1 || positionInChunk.y is < 0 or > ChunkHeight - 1 ||
-            positionInChunk.z is < 0 or > ChunkSize - 1) return new Block(DataTypes.Block.Air);
+            positionInChunk.z is < 0 or > ChunkSize - 1) return DataTypes.Block.Air;
         return chunkData[positionInChunk.x, positionInChunk.y, positionInChunk.z];
     }
 
@@ -104,10 +104,14 @@ public class Chunk
         public List<Color> colors;
     }
 
-    private static void AddSquareToCubeMesh(ref MeshAsLists mesh, Vector3Int blockPosition, Block block,
-        DataTypes.BlockSide blockSide)
+    private static void AddSquareToCubeMesh(
+        ref MeshAsLists mesh,
+        Vector3Int blockPosition,
+        DataTypes.Block block,
+        DataTypes.BlockSide blockSide
+    )
     {
-        if (block.block == DataTypes.Block.Air) return;
+        if (block == DataTypes.Block.Air) return;
 
         var sideVertices = SideVerts[blockSide];
         foreach (var index in new[] {0, 1, 2, 0, 2, 3})
@@ -118,7 +122,7 @@ public class Chunk
         }
 
         // 4 clockwise coords 
-        var blockSideUv = DependencyManager.Instance.ChunkMaterialManager.GetBlockSideUv(block, blockSide);
+        var blockSideUv = DependencyManager.Instance.ChunkMaterialManager.GetBlockSideUv(block, blockSide, blockPosition);
         mesh.uv.Add(blockSideUv[0]);
         mesh.uv.Add(blockSideUv[1]);
         mesh.uv.Add(blockSideUv[2]);
@@ -127,7 +131,7 @@ public class Chunk
         mesh.uv.Add(blockSideUv[3]);
 
         // grass has vertex color 0,1,0 so that the shader can do grass things
-        if (block.block == DataTypes.Block.Grass && blockSide != DataTypes.BlockSide.Bottom)
+        if (block == DataTypes.Block.Grass && blockSide != DataTypes.BlockSide.Bottom)
         {
             mesh.colors.AddRange(new[] {Color.green, Color.green, Color.green, Color.green, Color.green, Color.green});
         }
@@ -159,11 +163,11 @@ public class Chunk
         {
             case < 0:
                 return chunkSystem.GetChunk(chunkPosition + queryOffset)
-                           .GetBlock(new Vector3Int(edge, blockPositionInChunk.y, blockPositionInChunk.z)).block ==
+                           .GetBlock(new Vector3Int(edge, blockPositionInChunk.y, blockPositionInChunk.z)) ==
                        DataTypes.Block.Air;
             case > edge:
                 return chunkSystem.GetChunk(chunkPosition + queryOffset)
-                           .GetBlock(new Vector3Int(0, blockPositionInChunk.y, blockPositionInChunk.z)).block ==
+                           .GetBlock(new Vector3Int(0, blockPositionInChunk.y, blockPositionInChunk.z)) ==
                        DataTypes.Block.Air;
         }
 
@@ -171,16 +175,16 @@ public class Chunk
         {
             case < 0:
                 return chunkSystem.GetChunk(chunkPosition + queryOffset)
-                           .GetBlock(new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, edge)).block ==
+                           .GetBlock(new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, edge)) ==
                        DataTypes.Block.Air;
             case > edge:
                 return chunkSystem.GetChunk(chunkPosition + queryOffset)
-                           .GetBlock(new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, 0)).block ==
+                           .GetBlock(new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, 0)) ==
                        DataTypes.Block.Air;
         }
 
         var queryBlock = chunkData[queryPositionInChunk.x, queryPositionInChunk.y, queryPositionInChunk.z];
-        return queryBlock.block == DataTypes.Block.Air;
+        return queryBlock == DataTypes.Block.Air;
     }
 
     public void MakeChunkGameObject()

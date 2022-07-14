@@ -143,11 +143,11 @@ public class PlayerController : MonoBehaviour
 
         var breakingBlock = chunkSystem.GetBlock(destroyPosition);
 
-        chunkSystem.SetBlock(destroyPosition, new Block(DataTypes.Block.Air));
+        chunkSystem.SetBlock(destroyPosition, DataTypes.Block.Air);
 
         var particlesGameObject = Instantiate(breakBlockParticlesPrefab, destroyPosition, Quaternion.identity);
         particlesGameObject.GetComponent<ParticleSystemRenderer>().material =
-            DependencyManager.Instance.ChunkMaterialManager.GetBreakParticleTexture(breakingBlock.block);
+            DependencyManager.Instance.ChunkMaterialManager.GetBreakParticleTexture(breakingBlock);
 
         aliveParticleSystems.Add(particlesGameObject.GetComponent<ParticleSystem>());
     }
@@ -158,7 +158,7 @@ public class PlayerController : MonoBehaviour
 
         if (!highlightingBlock) return;
 
-        chunkSystem.SetBlock(placePosition, new Block(DataTypes.Block.Grass));
+        chunkSystem.SetBlock(placePosition, DataTypes.Block.Grass);
     }
 
     public Vector3Int GetChunkPosition()
