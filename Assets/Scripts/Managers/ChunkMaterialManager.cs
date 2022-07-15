@@ -131,7 +131,7 @@ public class ChunkMaterialManager
         return uvCoords;
     }
 
-    public Material GetBreakParticleTexture(DataTypes.Block block)
+    public Material GetBreakParticleMaterial(DataTypes.Block block)
     {
         if (breakParticleMaterials.ContainsKey(block)) return breakParticleMaterials[block];
 
@@ -143,6 +143,8 @@ public class ChunkMaterialManager
             mainTexture =
                 DependencyManager.Instance.TextureManager.GetTexture(blockTextures[DataTypes.BlockSide.Top].path)
         };
+
+        material.SetFloat(Shader.PropertyToID("_IsGrass"), block == DataTypes.Block.Grass ? 1 : 0);
 
         breakParticleMaterials[block] = material;
 

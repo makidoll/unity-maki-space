@@ -155,7 +155,12 @@ public class PlayerController : MonoBehaviour
 
         var particlesGameObject = Instantiate(breakBlockParticlesPrefab, destroyPosition, Quaternion.identity);
         particlesGameObject.GetComponent<ParticleSystemRenderer>().material =
-            DependencyManager.Instance.ChunkMaterialManager.GetBreakParticleTexture(breakingBlock);
+            DependencyManager.Instance.ChunkMaterialManager.GetBreakParticleMaterial(breakingBlock);
+
+        if (breakingBlock == DataTypes.Block.Grass)
+        {
+            
+        }
 
         aliveParticleSystems.Add(particlesGameObject.GetComponent<ParticleSystem>());
     }
