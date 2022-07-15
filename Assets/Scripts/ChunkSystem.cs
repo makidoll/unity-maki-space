@@ -119,6 +119,9 @@ public class ChunkSystem : MonoBehaviour
         chunk.SetBlock(positionInChunk, block);
         chunk.needMeshGen = true;
         
+        // lets immediately update the mesh so it doesnt flicker
+        chunk.UpdateMeshGen(); 
+        
         // we need to regenerate the mesh of a nearby chunk if we're on the edge
         
         const int edge = Chunk.ChunkSize - 1;
