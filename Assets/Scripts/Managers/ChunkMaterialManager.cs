@@ -23,24 +23,18 @@ public class ChunkMaterialManager
         var requiredTexturePaths = new List<string>();
         foreach (var (_, blockInfo) in DataTypes.AllBlockInfo)
         {
-            if (blockInfo.Textures != null)
+            if (blockInfo.Texture != null && !requiredTexturePaths.Contains(blockInfo.Texture.path))
             {
-                foreach (var (_, texture) in blockInfo.Textures)
-                {
-                    if (!requiredTexturePaths.Contains(texture.path))
-                    {
-                        requiredTexturePaths.Add(texture.path);
-                    }
-                }
+                requiredTexturePaths.Add(blockInfo.Texture.path);
             }
-            else if (blockInfo.Texture != null)
+            if (blockInfo.SideTexture != null && !requiredTexturePaths.Contains(blockInfo.SideTexture.path))
             {
-                if (!requiredTexturePaths.Contains(blockInfo.Texture.path))
-                {
-                    requiredTexturePaths.Add(blockInfo.Texture.path);
-                }
+                requiredTexturePaths.Add(blockInfo.SideTexture.path);
             }
-            // else its probably air
+            if (blockInfo.BottomTexture != null && !requiredTexturePaths.Contains(blockInfo.BottomTexture.path))
+            {
+                requiredTexturePaths.Add(blockInfo.BottomTexture.path);
+            }
         }
 
         if (requiredTexturePaths.Count > AtlasWidth * AtlasHeight)
@@ -110,8 +104,17 @@ public class ChunkMaterialManager
         }
 
         var blockInfo = DataTypes.AllBlockInfo[block];
-        var texture = blockInfo.Textures != null ? blockInfo.Textures[blockSide] : blockInfo.Texture;
-        if (texture == null) return new[] {Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero};
+        var isTopOrBottom = blockSide is DataTypes.BlockSide.Top or DataTypes.BlockSide.Bottom;
+        
+        var texture = blockInfo.Texture;
+        if (!isTopOrBottom && blockInfo.SideTexture != null)
+        {
+            texture = blockInfo.SideTexture;
+        }
+        if (blockSide == DataTypes.BlockSide.Bottom && blockInfo.BottomTexture != null)
+        {
+            texture = blockInfo.BottomTexture;
+        }
 
         var coords = atlasTexturePositions[texture.path];
 
@@ -132,7 +135,7 @@ public class ChunkMaterialManager
             position,
         };
 
-        if (texture.rotate)
+        if (isTopOrBottom)
         {
             var fixedRandom = Mathf.PerlinNoise(blockPosition.x * 123.456789f, blockPosition.z * 123.456789f);
             uvCoords = RotateUvCoords(
@@ -149,7 +152,7 @@ public class ChunkMaterialManager
         if (breakParticleMaterials.ContainsKey(block)) return breakParticleMaterials[block];
 
         var blockInfo = DataTypes.AllBlockInfo[block];
-        var topTexture = blockInfo.Textures != null ? blockInfo.Textures[DataTypes.BlockSide.Top] : blockInfo.Texture;
+        var topTexture = blockInfo.Texture;
 
         if (topTexture == null) return null;
 

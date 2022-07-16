@@ -16,14 +16,16 @@ public static class DataTypes
     public record BlockTexture
     {
         public string path;
-        public bool rotate;
+        // public bool rotate;
     }
 
     public record BlockInfo
     {
         public string Name;
-        [CanBeNull] public BlockTexture Texture;
-        [CanBeNull] public Dictionary<BlockSide, BlockTexture> Textures;
+        public BlockTexture Texture;
+        [CanBeNull] public BlockTexture SideTexture;
+        [CanBeNull] public BlockTexture BottomTexture;
+        // public bool TopBottomTextureRotates = false;
     }
 
     private const string TexturesBlockPath = "assets/minecraft/textures/block/";
@@ -48,29 +50,24 @@ public static class DataTypes
             Block.Grass, new BlockInfo
             {
                 Name = "Grass",
-                Textures = new Dictionary<BlockSide, BlockTexture>
-                {
-                    {BlockSide.Top, new() {path = TexturesBlockPath + "grass_block_top.png", rotate = true}},
-                    {BlockSide.Left, new() {path = TexturesBlockPath + "grass_block_side.png", rotate = false}},
-                    {BlockSide.Right, new() {path = TexturesBlockPath + "grass_block_side.png", rotate = false}},
-                    {BlockSide.Front, new() {path = TexturesBlockPath + "grass_block_side.png", rotate = false}},
-                    {BlockSide.Back, new() {path = TexturesBlockPath + "grass_block_side.png", rotate = false}},
-                    {BlockSide.Bottom, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
-                }
+                Texture = new BlockTexture {path = TexturesBlockPath + "grass_block_top.png"},
+                SideTexture = new BlockTexture {path = TexturesBlockPath + "grass_block_side.png"},
+                BottomTexture = new BlockTexture {path = TexturesBlockPath + "dirt.png"},
             }
         },
         {
             Block.Dirt, new BlockInfo
             {
                 Name = "Dirt",
-                Texture = new BlockTexture {path = TexturesBlockPath + "dirt.png", rotate = true}
+                Texture = new BlockTexture {path = TexturesBlockPath + "dirt.png"}
             }
         },
         {
             Block.Sand, new BlockInfo
             {
                 Name = "Sand",
-                Texture = new BlockTexture {path = TexturesBlockPath + "sand.png", rotate = true}
+                Texture = new BlockTexture {path = TexturesBlockPath + "sand.png"},
+                SideTexture = new BlockTexture {path = TexturesBlockPath + "sand.png"}
             }
         }
     };
