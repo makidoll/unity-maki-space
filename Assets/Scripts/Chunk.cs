@@ -41,11 +41,10 @@ public class Chunk
             {
                 var worldPos = new Vector2Int(chunkPosition.x, chunkPosition.z) * ChunkSize + new Vector2Int(x, z);
 
-                var isSand = Mathf.PerlinNoise(
+                var biomeNoise = Mathf.PerlinNoise(
                     worldPos.x * biomeNoiseScale,
                     worldPos.y * biomeNoiseScale
-                ) > 0.5;
-
+                );
 
                 var height = tallestHeight - Mathf.FloorToInt(
                     Mathf.PerlinNoise(
@@ -58,8 +57,9 @@ public class Chunk
                 {
                     if (y < height)
                     {
-                        if (isSand)
+                        if (biomeNoise < 0.4)
                         {
+                            // chunkData[x, y, z] = biomeNoise < 0.4 ? DataTypes.Block.Water : DataTypes.Block.Sand;
                             chunkData[x, y, z] = DataTypes.Block.Sand;
                         }
                         else

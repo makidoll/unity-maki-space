@@ -25,7 +25,7 @@ public static class DataTypes
         public BlockTexture Texture;
         [CanBeNull] public BlockTexture SideTexture;
         [CanBeNull] public BlockTexture BottomTexture;
-        // public bool TopBottomTextureRotates = false;
+        // public int AnimationFrames = 32;
     }
 
     private const string TexturesBlockPath = "assets/minecraft/textures/block/";
@@ -35,7 +35,8 @@ public static class DataTypes
         Air,
         Grass,
         Dirt,
-        Sand
+        Sand,
+        // Water
     }
 
     public static readonly Dictionary<Block, BlockInfo> AllBlockInfo = new()
@@ -70,5 +71,13 @@ public static class DataTypes
                 SideTexture = new BlockTexture {path = TexturesBlockPath + "sand.png"}
             }
         }
+        // {
+        //     Block.Water, new BlockInfo
+        //     {
+        //         Name = "Water",
+        //         Texture = new BlockTexture {path = TexturesBlockPath + "water_still.png"},
+        //         AnimationFrames = 32
+        //     }
+        // }
     };
 }
