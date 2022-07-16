@@ -23,14 +23,24 @@ public class ChunkMaterialManager
         var requiredTexturePaths = new List<string>();
         foreach (var (_, blockInfo) in DataTypes.AllBlockInfo)
         {
-            if (blockInfo.Textures == null) continue; // probably air
-            foreach (var (_, texture) in blockInfo.Textures)
+            if (blockInfo.Textures != null)
             {
-                if (!requiredTexturePaths.Contains(texture.path))
+                foreach (var (_, texture) in blockInfo.Textures)
                 {
-                    requiredTexturePaths.Add(texture.path);
+                    if (!requiredTexturePaths.Contains(texture.path))
+                    {
+                        requiredTexturePaths.Add(texture.path);
+                    }
                 }
             }
+            else if (blockInfo.Texture != null)
+            {
+                if (!requiredTexturePaths.Contains(blockInfo.Texture.path))
+                {
+                    requiredTexturePaths.Add(blockInfo.Texture.path);
+                }
+            }
+            // else its probably air
         }
 
         if (requiredTexturePaths.Count > AtlasWidth * AtlasHeight)
@@ -99,7 +109,10 @@ public class ChunkMaterialManager
             return new[] {Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero};
         }
 
-        var texture = DataTypes.AllBlockInfo[block].Textures[blockSide];
+        var blockInfo = DataTypes.AllBlockInfo[block];
+        var texture = blockInfo.Textures != null ? blockInfo.Textures[blockSide] : blockInfo.Texture;
+        if (texture == null) return new[] {Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero};
+
         var coords = atlasTexturePositions[texture.path];
 
         var position = coords / new Vector2(AtlasWidth, AtlasHeight);
@@ -135,13 +148,15 @@ public class ChunkMaterialManager
     {
         if (breakParticleMaterials.ContainsKey(block)) return breakParticleMaterials[block];
 
-        var blockTextures = DataTypes.AllBlockInfo[block].Textures;
-        if (blockTextures == null) return null;
+        var blockInfo = DataTypes.AllBlockInfo[block];
+        var topTexture = blockInfo.Textures != null ? blockInfo.Textures[DataTypes.BlockSide.Top] : blockInfo.Texture;
+
+        if (topTexture == null) return null;
 
         var material = new Material(Shader.Find("Maki/Break Particle"))
         {
             mainTexture =
-                DependencyManager.Instance.TextureManager.GetTexture(blockTextures[DataTypes.BlockSide.Top].path)
+                DependencyManager.Instance.TextureManager.GetTexture(topTexture.path)
         };
 
         material.SetFloat(Shader.PropertyToID("_IsGrass"), block == DataTypes.Block.Grass ? 1 : 0);

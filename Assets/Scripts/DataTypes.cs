@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
 public static class DataTypes
 {
@@ -21,7 +22,8 @@ public static class DataTypes
     public record BlockInfo
     {
         public string Name;
-        public Dictionary<BlockSide, BlockTexture> Textures;
+        [CanBeNull] public BlockTexture Texture;
+        [CanBeNull] public Dictionary<BlockSide, BlockTexture> Textures;
     }
 
     private const string TexturesBlockPath = "assets/minecraft/textures/block/";
@@ -30,7 +32,8 @@ public static class DataTypes
     {
         Air,
         Grass,
-        Dirt
+        Dirt,
+        Sand
     }
 
     public static readonly Dictionary<Block, BlockInfo> AllBlockInfo = new()
@@ -60,15 +63,14 @@ public static class DataTypes
             Block.Dirt, new BlockInfo
             {
                 Name = "Dirt",
-                Textures = new Dictionary<BlockSide, BlockTexture>
-                {
-                    {BlockSide.Top, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
-                    {BlockSide.Left, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
-                    {BlockSide.Right, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
-                    {BlockSide.Front, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
-                    {BlockSide.Back, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
-                    {BlockSide.Bottom, new() {path = TexturesBlockPath + "dirt.png", rotate = true}},
-                }
+                Texture = new BlockTexture {path = TexturesBlockPath + "dirt.png", rotate = true}
+            }
+        },
+        {
+            Block.Sand, new BlockInfo
+            {
+                Name = "Sand",
+                Texture = new BlockTexture {path = TexturesBlockPath + "sand.png", rotate = true}
             }
         }
     };
