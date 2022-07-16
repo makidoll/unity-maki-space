@@ -346,6 +346,7 @@ MonoBehaviour:
   selectionCube: {fileID: 1060602641}
   breakBlockParticlesPrefab: {fileID: 6963917220373837667, guid: c253dee11b636d54496003be55793a65, type: 3}
   animator: {fileID: 1803066064}
+  headBone: {fileID: 1050846684}
 --- !u!4 &323534708
 Transform:
   m_ObjectHideFlags: 0
@@ -676,6 +677,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!4 &1050846684 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -836400511372743874, guid: bdc3c972c297229468b14092e6b579fa, type: 3}
+  m_PrefabInstance: {fileID: 187532042}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1060602641
 GameObject:
   m_ObjectHideFlags: 0

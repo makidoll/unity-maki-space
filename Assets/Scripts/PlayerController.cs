@@ -23,6 +23,10 @@ public class PlayerController : MonoBehaviour
     private List<ParticleSystem> aliveParticleSystems = new();
 
     public Animator animator;
+    
+    private static readonly int AnimatorWalking = Animator.StringToHash("Walking");
+
+    public Transform headBone;
 
     private void Awake()
     {
@@ -83,7 +87,7 @@ public class PlayerController : MonoBehaviour
         var moveXy = inputActions.Player.Move.ReadValue<Vector2>();
         if (moveXy == Vector2.zero)
         {
-            animator.Play("Idle");
+            animator.SetBool(AnimatorWalking, false);
         }
         else
         {
@@ -92,7 +96,7 @@ public class PlayerController : MonoBehaviour
 
             rigidbody.MovePosition(transform.position + positionOffset * 0.1f);
             
-            animator.Play("Walk");
+            animator.SetBool(AnimatorWalking, true);
         }
     }
 
@@ -118,6 +122,8 @@ public class PlayerController : MonoBehaviour
         cameraPitch = Mathf.Clamp(cameraPitch + -lookDelta.y * sensitivity, -90, 90);
         camera.transform.localEulerAngles = new Vector3(cameraPitch, camera.transform.localEulerAngles.y,
             camera.transform.localEulerAngles.z);
+        
+        headBone.transform.localRotation = Quaternion.Euler(cameraPitch, 0, 0);
     }
 
     private void OnJump(InputAction.CallbackContext context)
