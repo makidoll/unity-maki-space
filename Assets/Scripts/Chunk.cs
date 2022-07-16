@@ -9,7 +9,7 @@ public class Chunk
 
     private GameObject chunkGameObject;
     private bool chunkGameObjectLoaded;
-    
+
     private MeshFilter meshFilter;
     private MeshCollider meshCollider;
 
@@ -17,7 +17,7 @@ public class Chunk
     public const int ChunkHeight = 256;
 
     private readonly DataTypes.Block[,,] chunkData = new DataTypes.Block[ChunkSize, ChunkHeight, ChunkSize];
-    public readonly Vector3Int chunkPosition;
+    private readonly Vector3Int chunkPosition;
 
     public bool needMeshGen = true;
 
@@ -29,28 +29,44 @@ public class Chunk
         this.chunkPosition.y = 0;
 
         const int tallestHeight = 128;
-        const float noiseScale = 1 / 20f;
-        const float noiseHeight = 4f;
+
+        const float grassNoiseScale = 1 / 20f;
+        const float grassNoiseHeight = 4f;
+
+        const float biomeNoiseScale = 1 / 80f;
 
         for (var x = 0; x < ChunkSize; x++)
         {
             for (var z = 0; z < ChunkSize; z++)
             {
-                var planeWorldPos = new Vector2Int(chunkPosition.x, chunkPosition.z) * ChunkSize + new Vector2Int(x, z);
+                var worldPos = new Vector2Int(chunkPosition.x, chunkPosition.z) * ChunkSize + new Vector2Int(x, z);
+
+                var isSand = Mathf.PerlinNoise(
+                    worldPos.x * biomeNoiseScale,
+                    worldPos.y * biomeNoiseScale
+                ) > 0.5;
+
 
                 var height = tallestHeight - Mathf.FloorToInt(
                     Mathf.PerlinNoise(
-                        planeWorldPos.x * noiseScale,
-                        planeWorldPos.y * noiseScale
-                    ) * (noiseHeight + 1f)
+                        worldPos.x * grassNoiseScale,
+                        worldPos.y * grassNoiseScale
+                    ) * (grassNoiseHeight + 1f)
                 );
 
                 for (var y = 0; y < ChunkHeight; y++)
                 {
                     if (y < height)
                     {
-                        chunkData[x, y, z] =
-                            y == height - 1 ? DataTypes.Block.Grass : DataTypes.Block.Dirt;
+                        if (isSand)
+                        {
+                            chunkData[x, y, z] = DataTypes.Block.Sand;
+                        }
+                        else
+                        {
+                            chunkData[x, y, z] =
+                                y == height - 1 ? DataTypes.Block.Grass : DataTypes.Block.Dirt;
+                        }
                     }
                     else
                     {
@@ -124,7 +140,8 @@ public class Chunk
         }
 
         // 4 clockwise coords 
-        var blockSideUv = DependencyManager.Instance.ChunkMaterialManager.GetBlockSideUv(block, blockSide, blockPosition);
+        var blockSideUv =
+            DependencyManager.Instance.ChunkMaterialManager.GetBlockSideUv(block, blockSide, blockPosition);
         mesh.uv.Add(blockSideUv[0]);
         mesh.uv.Add(blockSideUv[1]);
         mesh.uv.Add(blockSideUv[2]);
@@ -223,7 +240,7 @@ public class Chunk
     public void UpdateMeshGen()
     {
         if (!needMeshGen) return;
-        
+
         if (!chunkGameObjectLoaded) MakeChunkGameObject();
 
         var mesh = new Mesh();
