@@ -1,76 +1,76 @@
 # 3D models
-*.3dm filter=lfs diff=lfs merge=lfs -text
-*.3ds filter=lfs diff=lfs merge=lfs -text
-*.blend filter=lfs diff=lfs merge=lfs -text
-*.c4d filter=lfs diff=lfs merge=lfs -text
-*.collada filter=lfs diff=lfs merge=lfs -text
-*.dae filter=lfs diff=lfs merge=lfs -text
-*.dxf filter=lfs diff=lfs merge=lfs -text
-*.fbx filter=lfs diff=lfs merge=lfs -text
-*.jas filter=lfs diff=lfs merge=lfs -text
-*.lws filter=lfs diff=lfs merge=lfs -text
-*.lxo filter=lfs diff=lfs merge=lfs -text
-*.ma filter=lfs diff=lfs merge=lfs -text
-*.max filter=lfs diff=lfs merge=lfs -text
-*.mb filter=lfs diff=lfs merge=lfs -text
-*.obj filter=lfs diff=lfs merge=lfs -text
-*.ply filter=lfs diff=lfs merge=lfs -text
-*.skp filter=lfs diff=lfs merge=lfs -text
-*.stl filter=lfs diff=lfs merge=lfs -text
-*.ztl filter=lfs diff=lfs merge=lfs -text
+*.3dm filter=lfs diff=lfs merge=lfs
+*.3ds filter=lfs diff=lfs merge=lfs
+*.blend filter=lfs diff=lfs merge=lfs
+*.c4d filter=lfs diff=lfs merge=lfs
+*.collada filter=lfs diff=lfs merge=lfs
+*.dae filter=lfs diff=lfs merge=lfs
+*.dxf filter=lfs diff=lfs merge=lfs
+*.fbx filter=lfs diff=lfs merge=lfs
+*.jas filter=lfs diff=lfs merge=lfs
+*.lws filter=lfs diff=lfs merge=lfs
+*.lxo filter=lfs diff=lfs merge=lfs
+*.ma filter=lfs diff=lfs merge=lfs
+*.max filter=lfs diff=lfs merge=lfs
+*.mb filter=lfs diff=lfs merge=lfs
+*.obj filter=lfs diff=lfs merge=lfs
+*.ply filter=lfs diff=lfs merge=lfs
+*.skp filter=lfs diff=lfs merge=lfs
+*.stl filter=lfs diff=lfs merge=lfs
+*.ztl filter=lfs diff=lfs merge=lfs
 # Audio
-*.aif filter=lfs diff=lfs merge=lfs -text
-*.aiff filter=lfs diff=lfs merge=lfs -text
-*.it filter=lfs diff=lfs merge=lfs -text
-*.mod filter=lfs diff=lfs merge=lfs -text
-*.mp3 filter=lfs diff=lfs merge=lfs -text
-*.ogg filter=lfs diff=lfs merge=lfs -text
-*.s3m filter=lfs diff=lfs merge=lfs -text
-*.wav filter=lfs diff=lfs merge=lfs -text
-*.xm filter=lfs diff=lfs merge=lfs -text
+*.aif filter=lfs diff=lfs merge=lfs
+*.aiff filter=lfs diff=lfs merge=lfs
+*.it filter=lfs diff=lfs merge=lfs
+*.mod filter=lfs diff=lfs merge=lfs
+*.mp3 filter=lfs diff=lfs merge=lfs
+*.ogg filter=lfs diff=lfs merge=lfs
+*.s3m filter=lfs diff=lfs merge=lfs
+*.wav filter=lfs diff=lfs merge=lfs
+*.xm filter=lfs diff=lfs merge=lfs
 # Fonts
-*.otf filter=lfs diff=lfs merge=lfs -text
-*.ttf filter=lfs diff=lfs merge=lfs -text
+*.otf filter=lfs diff=lfs merge=lfs
+*.ttf filter=lfs diff=lfs merge=lfs
 # Images
-*.bmp filter=lfs diff=lfs merge=lfs -text
-*.exr filter=lfs diff=lfs merge=lfs -text
-*.gif filter=lfs diff=lfs merge=lfs -text
-*.hdr filter=lfs diff=lfs merge=lfs -text
-*.iff filter=lfs diff=lfs merge=lfs -text
-*.jpeg filter=lfs diff=lfs merge=lfs -text
-*.jpg filter=lfs diff=lfs merge=lfs -text
-*.pict filter=lfs diff=lfs merge=lfs -text
-*.png filter=lfs diff=lfs merge=lfs -text
-*.psd filter=lfs diff=lfs merge=lfs -text
-*.tga filter=lfs diff=lfs merge=lfs -text
-*.tif filter=lfs diff=lfs merge=lfs -text
-*.tiff filter=lfs diff=lfs merge=lfs -text
+*.bmp filter=lfs diff=lfs merge=lfs
+*.exr filter=lfs diff=lfs merge=lfs
+*.gif filter=lfs diff=lfs merge=lfs
+*.hdr filter=lfs diff=lfs merge=lfs
+*.iff filter=lfs diff=lfs merge=lfs
+*.jpeg filter=lfs diff=lfs merge=lfs
+*.jpg filter=lfs diff=lfs merge=lfs
+*.pict filter=lfs diff=lfs merge=lfs
+*.png filter=lfs diff=lfs merge=lfs
+*.psd filter=lfs diff=lfs merge=lfs
+*.tga filter=lfs diff=lfs merge=lfs
+*.tif filter=lfs diff=lfs merge=lfs
+*.tiff filter=lfs diff=lfs merge=lfs
 # Maki 3D models
-*.glb filter=lfs diff=lfs merge=lfs -text
-*.gltf filter=lfs diff=lfs merge=lfs -text
-*.bin filter=lfs diff=lfs merge=lfs -text
+*.glb filter=lfs diff=lfs merge=lfs
+*.gltf filter=lfs diff=lfs merge=lfs
+*.bin filter=lfs diff=lfs merge=lfs
 # Maki audio
-*.oga filter=lfs diff=lfs merge=lfs -text
-*.m4a filter=lfs diff=lfs merge=lfs -text
-*.aac filter=lfs diff=lfs merge=lfs -text
-*.alac filter=lfs diff=lfs merge=lfs -text
-*.flac filter=lfs diff=lfs merge=lfs -text
-*.opus filter=lfs diff=lfs merge=lfs -text
-*.webm filter=lfs diff=lfs merge=lfs -text
+*.oga filter=lfs diff=lfs merge=lfs
+*.m4a filter=lfs diff=lfs merge=lfs
+*.aac filter=lfs diff=lfs merge=lfs
+*.alac filter=lfs diff=lfs merge=lfs
+*.flac filter=lfs diff=lfs merge=lfs
+*.opus filter=lfs diff=lfs merge=lfs
+*.webm filter=lfs diff=lfs merge=lfs
 # Maki fonts
-*.woff filter=lfs diff=lfs merge=lfs -text
-*.woff2 filter=lfs diff=lfs merge=lfs -text
+*.woff filter=lfs diff=lfs merge=lfs
+*.woff2 filter=lfs diff=lfs merge=lfs
 # Maki images
-*.webp filter=lfs diff=lfs merge=lfs -text
-*.heic filter=lfs diff=lfs merge=lfs -text
-*.heif filter=lfs diff=lfs merge=lfs -text
-*.jfif filter=lfs diff=lfs merge=lfs -text
-*.flif filter=lfs diff=lfs merge=lfs -text
-*.afdesign filter=lfs diff=lfs merge=lfs -text
-*.afphoto filter=lfs diff=lfs merge=lfs -text
-*.kra filter=lfs diff=lfs merge=lfs -text
-*.sai filter=lfs diff=lfs merge=lfs -text
-*.xcf filter=lfs diff=lfs merge=lfs -text
+*.webp filter=lfs diff=lfs merge=lfs
+*.heic filter=lfs diff=lfs merge=lfs
+*.heif filter=lfs diff=lfs merge=lfs
+*.jfif filter=lfs diff=lfs merge=lfs
+*.flif filter=lfs diff=lfs merge=lfs
+*.afdesign filter=lfs diff=lfs merge=lfs
+*.afphoto filter=lfs diff=lfs merge=lfs
+*.kra filter=lfs diff=lfs merge=lfs
+*.sai filter=lfs diff=lfs merge=lfs
+*.xcf filter=lfs diff=lfs merge=lfs
 
 # Collapse Unity-generated files on GitHub
 *.asset linguist-generated
@@ -81,4 +81,4 @@
 
 # This will treat all files as text files and convert to OS's line ending
 # on checkout and back to LF on commit automatically.
-* text=auto
+# * text=auto

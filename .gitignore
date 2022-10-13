@@ -141,3 +141,6 @@ $RECYCLE.BIN/
 *.blend1
 *.blend1.meta
 .idea
+*.private.0
+*.private.0.meta
+.plastic
