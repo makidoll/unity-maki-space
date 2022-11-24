@@ -9,10 +9,10 @@ namespace Unity_Maki_Space.Scripts.Managers
 {
     public class TextureManager : Manager
     {
-        private ZipArchive archive;
+        private ZipArchive _archive;
 
-        private readonly Dictionary<string, Texture2D> loadedTextures = new();
-        private readonly Dictionary<string, Sprite> loadedSprites = new();
+        private readonly Dictionary<string, Texture2D> _loadedTextures = new();
+        private readonly Dictionary<string, Sprite> _loadedSprites = new();
 
         public override Task Init()
         {
@@ -26,16 +26,16 @@ namespace Unity_Maki_Space.Scripts.Managers
             var resourcePackBytes = Resources.Load<TextAsset>("Resource Packs/Dandelion+X+1.19b").bytes;
             var resourcePackStream = new MemoryStream(resourcePackBytes);
 
-            archive = new ZipArchive(resourcePackStream, ZipArchiveMode.Read);
+            _archive = new ZipArchive(resourcePackStream, ZipArchiveMode.Read);
 
             return Task.CompletedTask;
         }
 
         public Texture2D GetTexture(string texturePath)
         {
-            if (loadedTextures.ContainsKey(texturePath)) return loadedTextures[texturePath];
+            if (_loadedTextures.ContainsKey(texturePath)) return _loadedTextures[texturePath];
 
-            var entry = archive.Entries.First(entry => entry.FullName == texturePath);
+            var entry = _archive.Entries.First(entry => entry.FullName == texturePath);
             var stream = entry.Open();
             var memoryStream = new MemoryStream();
             stream.CopyTo(memoryStream);
@@ -45,7 +45,7 @@ namespace Unity_Maki_Space.Scripts.Managers
             texture.LoadImage(memoryStream.ToArray());
             texture.filterMode = FilterMode.Point;
 
-            loadedTextures[texturePath] = texture;
+            _loadedTextures[texturePath] = texture;
 
             return texture;
         }
@@ -70,11 +70,11 @@ namespace Unity_Maki_Space.Scripts.Managers
         public Sprite GetCroppedSprite(string texturePath, Rect rect)
         {
             var texturePathWithCrop = $"{texturePath} {rect.width}x{rect.height}+{rect.x}+{rect.y}";
-            if (loadedSprites.ContainsKey(texturePathWithCrop)) return loadedSprites[texturePathWithCrop];
+            if (_loadedSprites.ContainsKey(texturePathWithCrop)) return _loadedSprites[texturePathWithCrop];
 
             var sprite = Sprite.Create(GetTexture(texturePath), rect, new Vector2(0.5f, 0.5f));
 
-            loadedSprites[texturePathWithCrop] = sprite;
+            _loadedSprites[texturePathWithCrop] = sprite;
 
             return sprite;
         }

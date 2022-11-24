@@ -7,19 +7,19 @@ namespace Unity_Maki_Space.Scripts.Managers
 {
     public class UIManager : Manager
     {
-        private readonly Canvas canvas;
+        private readonly Canvas _canvas;
 
         private const int UiScale = 3;
 
-        private UnityMakiSpaceInputActions inputActions;
+        private UnityMakiSpaceInputActions _inputActions;
 
-        private int inventorySelectionPosition;
-        private RectTransform inventorySelectionRectTransform;
+        private int _inventorySelectionPosition;
+        private RectTransform _inventorySelectionRectTransform;
 
         public UIManager(Canvas canvas)
         {
-            this.canvas = canvas;
-            this.canvas.gameObject.SetActive(true);
+            _canvas = canvas;
+            _canvas.gameObject.SetActive(true);
         }
         
         public override Task Init()
@@ -29,14 +29,14 @@ namespace Unity_Maki_Space.Scripts.Managers
             var inventoryBar = AddInventoryBar();
             AddInventorySelection(inventoryBar);
 
-            inputActions = new UnityMakiSpaceInputActions();
-            inputActions.UI.Enable();
+            _inputActions = new UnityMakiSpaceInputActions();
+            _inputActions.UI.Enable();
 
-            inputActions.UI.InventoryScroll.performed += OnInventoryScroll;
-            inputActions.UI.InventoryScroll.Enable();
+            _inputActions.UI.InventoryScroll.performed += OnInventoryScroll;
+            _inputActions.UI.InventoryScroll.Enable();
         
-            inputActions.UI.InventoryKey.performed += OnInventoryKey;
-            inputActions.UI.InventoryKey.Enable();
+            _inputActions.UI.InventoryKey.performed += OnInventoryKey;
+            _inputActions.UI.InventoryKey.Enable();
             
             return Task.CompletedTask;
         }
@@ -58,7 +58,7 @@ namespace Unity_Maki_Space.Scripts.Managers
         
         private GameObject AddCrosshair()
         {
-            var gameObject = MakeImageGameObject("Crosshair", canvas.transform);
+            var gameObject = MakeImageGameObject("Crosshair", _canvas.transform);
 
             gameObject.GetComponent<Image>().sprite = DependencyManager.Instance.TextureManager.GetCroppedSprite(
                 "assets/minecraft/textures/gui/widgets.png", 
@@ -76,7 +76,7 @@ namespace Unity_Maki_Space.Scripts.Managers
         
         private GameObject AddInventoryBar()
         {
-            var gameObject = MakeImageGameObject("Inventory Bar", canvas.transform);
+            var gameObject = MakeImageGameObject("Inventory Bar", _canvas.transform);
 
             gameObject.GetComponent<Image>().sprite = DependencyManager.Instance.TextureManager.GetCroppedSprite(
                 "assets/minecraft/textures/gui/widgets.png", 
@@ -111,14 +111,14 @@ namespace Unity_Maki_Space.Scripts.Managers
             rectTransform.anchorMax = new Vector2(0, 0.5f);
             rectTransform.anchoredPosition = Vector2.zero;
 
-            inventorySelectionRectTransform = rectTransform;
+            _inventorySelectionRectTransform = rectTransform;
 
             return gameObject;
         }
         
         private void UpdateInventorySelection()
         {
-            inventorySelectionRectTransform.anchoredPosition = new Vector2(20 * inventorySelectionPosition * UiScale, 0);
+            _inventorySelectionRectTransform.anchoredPosition = new Vector2(20 * _inventorySelectionPosition * UiScale, 0);
         }
         
         private void OnInventoryScroll(InputAction.CallbackContext context)
@@ -126,9 +126,9 @@ namespace Unity_Maki_Space.Scripts.Managers
             if (!Application.isFocused || Cursor.lockState != CursorLockMode.Locked) return;
 
             var scrollUp = context.ReadValue<float>() > 0;
-            inventorySelectionPosition = scrollUp ? inventorySelectionPosition - 1 : inventorySelectionPosition + 1;
-            if (inventorySelectionPosition > 8) inventorySelectionPosition = 0;
-            if (inventorySelectionPosition < 0) inventorySelectionPosition = 8;
+            _inventorySelectionPosition = scrollUp ? _inventorySelectionPosition - 1 : _inventorySelectionPosition + 1;
+            if (_inventorySelectionPosition > 8) _inventorySelectionPosition = 0;
+            if (_inventorySelectionPosition < 0) _inventorySelectionPosition = 8;
             UpdateInventorySelection();
         }
     
@@ -136,9 +136,9 @@ namespace Unity_Maki_Space.Scripts.Managers
         {
             if (!Application.isFocused || Cursor.lockState != CursorLockMode.Locked) return;
 
-            inventorySelectionPosition = (int) Mathf.Floor(context.ReadValue<float>()) - 1;
-            if (inventorySelectionPosition > 8) inventorySelectionPosition = 8;
-            if (inventorySelectionPosition < 0) inventorySelectionPosition = 0;
+            _inventorySelectionPosition = (int) Mathf.Floor(context.ReadValue<float>()) - 1;
+            if (_inventorySelectionPosition > 8) _inventorySelectionPosition = 8;
+            if (_inventorySelectionPosition < 0) _inventorySelectionPosition = 0;
             UpdateInventorySelection();
 
         }

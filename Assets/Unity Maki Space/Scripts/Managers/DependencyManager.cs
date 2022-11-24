@@ -18,8 +18,8 @@ namespace Unity_Maki_Space.Scripts.Managers
 
         public List<GameObject> persistantGameObjects;
         
-        private Manager[] managers;
-        private bool initialized;
+        private Manager[] _managers;
+        private bool _initialized;
 
         private async void Awake()
         {
@@ -41,7 +41,7 @@ namespace Unity_Maki_Space.Scripts.Managers
             newManagers.Add(UIManager = new UIManager(uiCanvas));
             persistantGameObjects.Add(uiCanvas.gameObject);
 
-            managers = newManagers.ToArray();
+            _managers = newManagers.ToArray();
             
             foreach (var persistantGameObject in persistantGameObjects)
             {
@@ -50,15 +50,15 @@ namespace Unity_Maki_Space.Scripts.Managers
             
             // do scene change here if necessary
 
-            await Task.WhenAll(managers.Select(m => m.Init()));
+            await Task.WhenAll(_managers.Select(m => m.Init()));
 
-            initialized = true;
+            _initialized = true;
         }
 
         private void Update()
         {
-            if (!initialized) return;
-            foreach (var manager in managers)
+            if (!_initialized) return;
+            foreach (var manager in _managers)
             {
                 manager.Update();
             }
@@ -66,8 +66,8 @@ namespace Unity_Maki_Space.Scripts.Managers
 
         private void OnDestroy()
         {
-            if (!initialized) return;
-            foreach (var manager in managers)
+            if (!_initialized) return;
+            foreach (var manager in _managers)
             {
                 manager.Update();
             }

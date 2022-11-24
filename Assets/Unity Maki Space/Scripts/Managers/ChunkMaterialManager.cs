@@ -8,15 +8,15 @@ namespace Unity_Maki_Space.Scripts.Managers
 {
     public class ChunkMaterialManager : Manager
     {
-        private int textureSize;
+        private int _textureSize;
 
         private const int AtlasWidth = 8;
         private const int AtlasHeight = 8;
-        private Texture2D atlasTexture;
-        private Material atlasMaterial;
-        private readonly Dictionary<string, Vector2Int> atlasTexturePositions = new();
+        private Texture2D _atlasTexture;
+        private Material _atlasMaterial;
+        private readonly Dictionary<string, Vector2Int> _atlasTexturePositions = new();
 
-        private readonly Dictionary<DataTypes.Block, Material> breakParticleMaterials = new();
+        private readonly Dictionary<DataTypes.Block, Material> _breakParticleMaterials = new();
 
         public override Task Init()
         {
@@ -53,9 +53,9 @@ namespace Unity_Maki_Space.Scripts.Managers
             var sampleDirtTexture = textureManger.GetTexture("assets/minecraft/textures/block/dirt.png");
 
             // should be 16 but you never know right
-            textureSize = sampleDirtTexture.width;
+            _textureSize = sampleDirtTexture.width;
 
-            atlasTexture = new Texture2D(AtlasWidth * textureSize, AtlasHeight * textureSize, TextureFormat.RGB24,
+            _atlasTexture = new Texture2D(AtlasWidth * _textureSize, AtlasHeight * _textureSize, TextureFormat.RGB24,
                 false)
             {
                 filterMode = FilterMode.Point
@@ -66,18 +66,19 @@ namespace Unity_Maki_Space.Scripts.Managers
                 var texturePath = requiredTexturePaths[i];
                 var texture = textureManger.GetTexture(texturePath);
                 var x = i % AtlasWidth;
-                var y = Mathf.FloorToInt((float) i / AtlasWidth);
-                atlasTexturePositions[texturePath] = new Vector2Int(x, y);
-                atlasTexture.SetPixels(x * textureSize, y * textureSize, textureSize, textureSize, texture.GetPixels());
+                var y = Mathf.FloorToInt((float)i / AtlasWidth);
+                _atlasTexturePositions[texturePath] = new Vector2Int(x, y);
+                _atlasTexture.SetPixels(x * _textureSize, y * _textureSize, _textureSize, _textureSize,
+                    texture.GetPixels());
             }
 
-            atlasTexture.Apply();
+            _atlasTexture.Apply();
 
             // make material
 
-            atlasMaterial = new Material(Shader.Find("Maki/Block"))
+            _atlasMaterial = new Material(Shader.Find("Maki/Block"))
             {
-                mainTexture = atlasTexture
+                mainTexture = _atlasTexture
             };
 
             return Task.CompletedTask;
@@ -85,7 +86,7 @@ namespace Unity_Maki_Space.Scripts.Managers
 
         public Material GetAtlasMaterial()
         {
-            return atlasMaterial;
+            return _atlasMaterial;
         }
 
         private static Vector2 Rotate(Vector2 point, Vector2 pivot, float deg)
@@ -107,7 +108,7 @@ namespace Unity_Maki_Space.Scripts.Managers
         {
             if (!DataTypes.AllBlockInfo.ContainsKey(block))
             {
-                return new[] {Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero};
+                return new[] { Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero };
             }
 
             var blockInfo = DataTypes.AllBlockInfo[block];
@@ -124,11 +125,11 @@ namespace Unity_Maki_Space.Scripts.Managers
                 texture = blockInfo.BottomTexture;
             }
 
-            var coords = atlasTexturePositions[texture.path];
-
+            var coords = _atlasTexturePositions[texture.path];
             var position = coords / new Vector2(AtlasWidth, AtlasHeight);
-            var width = (float) textureSize / atlasTexture.width;
-            var height = (float) textureSize / atlasTexture.height;
+            // TODO: optimize this?
+            var width = (float)_textureSize / (AtlasWidth * _textureSize);
+            var height = (float)_textureSize / (AtlasHeight * _textureSize);
 
             // 0 --- 1
             // |     |
@@ -157,7 +158,7 @@ namespace Unity_Maki_Space.Scripts.Managers
 
         public Material GetBreakParticleMaterial(DataTypes.Block block)
         {
-            if (breakParticleMaterials.ContainsKey(block)) return breakParticleMaterials[block];
+            if (_breakParticleMaterials.ContainsKey(block)) return _breakParticleMaterials[block];
 
             var blockInfo = DataTypes.AllBlockInfo[block];
             var topTexture = blockInfo.Texture;
@@ -172,7 +173,7 @@ namespace Unity_Maki_Space.Scripts.Managers
 
             material.SetFloat(Shader.PropertyToID("_IsGrass"), block == DataTypes.Block.Grass ? 1 : 0);
 
-            breakParticleMaterials[block] = material;
+            _breakParticleMaterials[block] = material;
 
             return material;
         }
