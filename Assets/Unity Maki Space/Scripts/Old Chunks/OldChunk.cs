@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity_Maki_Space.Scripts.Managers;
 using UnityEngine;
 
-public class Chunk
+public class OldChunk
 {
-    private readonly ChunkSystem chunkSystem;
+    private readonly OldChunkSystem oldChunkSystem;
 
     private GameObject chunkGameObject;
     private bool chunkGameObjectLoaded;
@@ -21,9 +22,9 @@ public class Chunk
 
     public bool needMeshGen = true;
 
-    public Chunk(ChunkSystem chunkSystem, Vector3Int chunkPosition)
+    public OldChunk(OldChunkSystem oldChunkSystem, Vector3Int chunkPosition)
     {
-        this.chunkSystem = chunkSystem;
+        this.oldChunkSystem = oldChunkSystem;
 
         this.chunkPosition = chunkPosition;
         this.chunkPosition.y = 0;
@@ -181,11 +182,11 @@ public class Chunk
         switch (queryPositionInChunk.x)
         {
             case < 0:
-                return chunkSystem.GetChunk(chunkPosition + queryOffset)
+                return oldChunkSystem.GetChunk(chunkPosition + queryOffset)
                            .GetBlock(new Vector3Int(edge, blockPositionInChunk.y, blockPositionInChunk.z)) ==
                        DataTypes.Block.Air;
             case > edge:
-                return chunkSystem.GetChunk(chunkPosition + queryOffset)
+                return oldChunkSystem.GetChunk(chunkPosition + queryOffset)
                            .GetBlock(new Vector3Int(0, blockPositionInChunk.y, blockPositionInChunk.z)) ==
                        DataTypes.Block.Air;
         }
@@ -193,11 +194,11 @@ public class Chunk
         switch (queryPositionInChunk.z)
         {
             case < 0:
-                return chunkSystem.GetChunk(chunkPosition + queryOffset)
+                return oldChunkSystem.GetChunk(chunkPosition + queryOffset)
                            .GetBlock(new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, edge)) ==
                        DataTypes.Block.Air;
             case > edge:
-                return chunkSystem.GetChunk(chunkPosition + queryOffset)
+                return oldChunkSystem.GetChunk(chunkPosition + queryOffset)
                            .GetBlock(new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, 0)) ==
                        DataTypes.Block.Air;
         }
@@ -217,7 +218,7 @@ public class Chunk
             layer = LayerMask.NameToLayer("Chunk")
         };
 
-        chunkSystem.chunksWithGameObjects.Add(this);
+        oldChunkSystem.chunksWithGameObjects.Add(this);
 
         var meshRenderer = chunkGameObject.AddComponent<MeshRenderer>();
 

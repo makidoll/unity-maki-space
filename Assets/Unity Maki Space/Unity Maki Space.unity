@@ -134,12 +134,12 @@ GameObject:
   - component: {fileID: 71068978}
   - component: {fileID: 71068977}
   m_Layer: 0
-  m_Name: Chunk System
+  m_Name: Old Chunk System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &71068977
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147,7 +147,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 71068976}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcc16f7e55146874a8632163acfa439b, type: 3}
   m_Name: 
@@ -193,12 +193,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 89083281}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 739.75055, y: 490.7401, z: 174.41904}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &89083284
 MonoBehaviour:
@@ -212,6 +212,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d824d68b60de5642a04302fbe9e00f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uiCanvas: {fileID: 678409707}
+  persistantGameObjects: []
 --- !u!1001 &187532042
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -342,7 +344,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cb3d25d4267d0549aeca56e0cb03677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkSystem: {fileID: 71068977}
+  oldChunkSystem: {fileID: 0}
   selectionCube: {fileID: 1060602641}
   breakBlockParticlesPrefab: {fileID: 6963917220373837667, guid: c253dee11b636d54496003be55793a65, type: 3}
   animator: {fileID: 1803066064}
@@ -440,7 +442,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &359397553
 MonoBehaviour:
@@ -454,6 +456,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
   m_MoveRepeatDelay: 0.5
   m_MoveRepeatRate: 0.1
   m_XRTrackingOrigin: {fileID: 0}
@@ -470,6 +473,7 @@ MonoBehaviour:
   m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
+  m_CursorLockBehavior: 0
 --- !u!1 &678409704
 GameObject:
   m_ObjectHideFlags: 0
@@ -489,7 +493,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &678409705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -564,7 +568,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -583,6 +587,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2143661585a266c4fbed7be6edb70129, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inventorySelectionPosition: 0
+  inventorySelectionRectTransform: {fileID: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

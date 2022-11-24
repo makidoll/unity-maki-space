@@ -1,18 +1,18 @@
 using System.Collections.Generic;
-using System.Linq;
+using Unity_Maki_Space.Scripts.Managers;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    private InputActions inputActions;
+    private UnityMakiSpaceInputActions inputActions;
 
     private new Camera camera;
     private float cameraPitch;
 
     private new Rigidbody rigidbody;
 
-    public ChunkSystem chunkSystem;
+    public OldChunkSystem oldChunkSystem;
 
     private bool highlightingBlock;
     private Vector3Int placePosition;
@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     public GameObject selectionCube;
 
     public GameObject breakBlockParticlesPrefab;
-    private List<ParticleSystem> aliveParticleSystems = new();
+    private readonly List<ParticleSystem> aliveParticleSystems = new();
 
     public Animator animator;
     
@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour
         rigidbody = GetComponent<Rigidbody>();
         rigidbody.freezeRotation = true;
 
-        inputActions = new InputActions();
+        inputActions = new UnityMakiSpaceInputActions();
         inputActions.Player.Enable();
 
         inputActions.Player.Move.Enable();
@@ -155,9 +155,9 @@ public class PlayerController : MonoBehaviour
 
         if (!highlightingBlock) return;
 
-        var breakingBlock = chunkSystem.GetBlock(destroyPosition);
+        var breakingBlock = oldChunkSystem.GetBlock(destroyPosition);
 
-        chunkSystem.SetBlock(destroyPosition, DataTypes.Block.Air);
+        oldChunkSystem.SetBlock(destroyPosition, DataTypes.Block.Air);
 
         var particlesGameObject = Instantiate(breakBlockParticlesPrefab, destroyPosition, Quaternion.identity);
         particlesGameObject.GetComponent<ParticleSystemRenderer>().material =
@@ -177,12 +177,12 @@ public class PlayerController : MonoBehaviour
 
         if (!highlightingBlock) return;
 
-        chunkSystem.SetBlock(placePosition, DataTypes.Block.Grass);
+        oldChunkSystem.SetBlock(placePosition, DataTypes.Block.Grass);
     }
 
     public Vector3Int GetChunkPosition()
     {
-        return new Vector3Int(Mathf.FloorToInt((float) gameObject.transform.position.x / Chunk.ChunkSize), 0,
-            Mathf.FloorToInt((float) gameObject.transform.position.z / Chunk.ChunkSize));
+        return new Vector3Int(Mathf.FloorToInt((float) gameObject.transform.position.x / OldChunk.ChunkSize), 0,
+            Mathf.FloorToInt((float) gameObject.transform.position.z / OldChunk.ChunkSize));
     }
 }

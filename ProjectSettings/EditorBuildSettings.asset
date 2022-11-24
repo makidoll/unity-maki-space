@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Unity Minecraft.unity
+    path: Assets/Unity Maki Space/Unity Maki Space.unity
     guid: 0c4ed0c8a7b99d1469178d4da6561b38
   m_configObjects: {}
