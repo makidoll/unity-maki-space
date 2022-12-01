@@ -81,6 +81,11 @@ namespace Unity_Maki_Space.Scripts.Managers
                 mainTexture = _atlasTexture
             };
 
+            _atlasMaterial.SetTexture(
+                "_GrassColorMap",
+                textureManger.GetTexture("assets/minecraft/textures/colormap/grass.png")
+            );
+
             return Task.CompletedTask;
         }
 
@@ -170,6 +175,12 @@ namespace Unity_Maki_Space.Scripts.Managers
                 mainTexture =
                     DependencyManager.Instance.TextureManager.GetTexture(topTexture.path)
             };
+
+            var textureManger = DependencyManager.Instance.TextureManager;
+            material.SetTexture(
+                "_GrassColorMap",
+                textureManger.GetTexture("assets/minecraft/textures/colormap/grass.png")
+            );
 
             material.SetFloat(Shader.PropertyToID("_IsGrass"), block == DataTypes.Block.Grass ? 1 : 0);
 

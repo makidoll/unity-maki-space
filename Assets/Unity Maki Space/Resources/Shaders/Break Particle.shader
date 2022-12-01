@@ -90,10 +90,13 @@
         // Physically based Standard lighting model, and enable shadows on all light types
         #pragma surface surf Standard fullforwardshadows
 
+        #include "GrassColor.cginc"
+        
         // Use shader model 3.0 target, to get nicer looking lighting
         #pragma target 3.0
 
         sampler2D _MainTex;
+        sampler2D _GrassColorMap;
 
         float _IsGrass;
 
@@ -101,6 +104,7 @@
         {
             float2 uv_MainTex;
             float4 color : COLOR;
+        	float3 worldPos;
         };
 
         // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
@@ -109,7 +113,7 @@
         UNITY_INSTANCING_BUFFER_START(Props)
             // put more per-instance properties here
         UNITY_INSTANCING_BUFFER_END(Props)
-
+        
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
             // particle system will set color red randomly
@@ -128,9 +132,7 @@
 			
 			if (_IsGrass)
 			{
-				// randomly sampled from
-                // https://minecraft.fandom.com/wiki/Color?file=Grasscolor.png#Grass
-                col.rgb *= fixed3(129, 190, 92) / 255;
+				col.rgb *= GrassColor(IN.worldPos, _GrassColorMap);
 			}
         	
             o.Albedo = col.rgb;
