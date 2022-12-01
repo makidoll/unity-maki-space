@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -18,8 +19,7 @@ namespace Unity_Maki_Space.Scripts.Chunks
         public const int ChunkSize = 16;
         public const int ChunkHeight = 256;
 
-        private readonly Dictionary<Vector2Int, Chunk> _chunks = new();
-        private readonly object _chunksLock = new();
+        private readonly ConcurrentDictionary<Vector2Int, Chunk> _chunks = new();
 
         private Vector2Int _lastPlayerPosition = new(999999, 999999);
 
@@ -96,25 +96,19 @@ namespace Unity_Maki_Space.Scripts.Chunks
 
         private void DeleteAllChunks()
         {
-            lock (_chunksLock)
+            foreach (var chunk in _chunks.Values)
             {
-                foreach (var chunk in _chunks.Values)
-                {
-                    DestroyChunk(chunk);
-                }
-
-                _chunks.Clear();
+                DestroyChunk(chunk);
             }
+
+            _chunks.Clear();
         }
 
         public void ReloadAllChunks()
         {
-            lock (_chunksLock)
+            foreach (var chunk in _chunks.Values)
             {
-                foreach (var chunk in _chunks.Values)
-                {
-                    chunk.ReloadThreadSafe();
-                }
+                chunk.ReloadThreadSafe();
             }
         }
 
@@ -129,37 +123,23 @@ namespace Unity_Maki_Space.Scripts.Chunks
 
         private void SetThreadSafeChunk(Vector2Int position, Chunk chunk)
         {
-            lock (_chunksLock)
-            {
-                _chunks[position] = chunk;
-            }
+            _chunks[position] = chunk;
         }
 
         public Chunk GetThreadSafeChunk(Vector2Int position)
         {
-            lock (_chunksLock)
-            {
-                return _chunks.TryGetValue(position, out var chunk) ? chunk : null;
-            }
+            return _chunks.TryGetValue(position, out var chunk) ? chunk : null;
         }
-
-        private int glslMod(int x, int m)
+        
+        private void OnBlockChanged(Vector3Int worldPos, Vector3Int posInChunk, DataTypes.Block block)
         {
-            return (x % m + m) % m;
-        }
-
-        private void OnBlockChanged(Vector3Int worldPos, DataTypes.Block block)
-        {
-            var chunkPosition = new Vector2Int(
-                Mathf.FloorToInt((float)worldPos.x / ChunkSize),
-                Mathf.FloorToInt((float)worldPos.z / ChunkSize)
-            );
+            var chunkPosition = Utils.WorldPosToChunkPos(worldPos);
 
             GetThreadSafeChunk(chunkPosition)?.ReloadThreadSafe();
 
             // if block is on the edge, reload chunk next to it
 
-            switch (glslMod(worldPos.x, ChunkSize))
+            switch (posInChunk.x)
             {
                 case 0:
                     GetThreadSafeChunk(chunkPosition + new Vector2Int(-1, 0))?.ReloadThreadSafe();
@@ -169,7 +149,7 @@ namespace Unity_Maki_Space.Scripts.Chunks
                     break;
             }
             
-            switch (glslMod(worldPos.z, ChunkSize))
+            switch (posInChunk.z)
             {
                 case 0:
                     GetThreadSafeChunk(chunkPosition + new Vector2Int(0, -1))?.ReloadThreadSafe();
@@ -322,20 +302,11 @@ namespace Unity_Maki_Space.Scripts.Chunks
 
             if (playedMovedChunk)
             {
-                Chunk[] chunks;
-                lock (_chunksLock)
-                {
-                    chunks = _chunks.Values.ToArray();
-                }
-
-                foreach (var chunk in chunks)
+                foreach (var chunk in _chunks.Values.ToArray())
                 {
                     if (_currentSortedChunkPositions.Contains(chunk.chunkPosition)) continue;
                     DestroyChunk(chunk);
-                    lock (_chunksLock)
-                    {
-                        _chunks.Remove(chunk.chunkPosition);
-                    }
+                    _chunks.Remove(chunk.chunkPosition, out _);
                 }
             }
         }

@@ -160,6 +160,9 @@ namespace Unity_Maki_Space.Scripts.Player
 
             var breakingBlock = DependencyManager.Instance.ChunkDataManager.GetWorldBlock(_destroyPosition);
 
+            // in case the chunk mesh hasn't been updated yet and we're trying to break air
+            if (breakingBlock == DataTypes.Block.Air) return;
+            
             DependencyManager.Instance.ChunkDataManager.SetWorldBlock(_destroyPosition, DataTypes.Block.Air);
 
             var particlesGameObject = Instantiate(breakBlockParticlesPrefab, _destroyPosition, Quaternion.identity);

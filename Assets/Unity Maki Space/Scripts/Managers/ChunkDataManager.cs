@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -7,12 +8,10 @@ namespace Unity_Maki_Space.Scripts.Managers
 {
     public class ChunkDataManager : Manager
     {
-        // TODO: split this up into chunks maybe. locking makes this stupidly slow too
-        
-        private readonly Dictionary<Vector3Int, DataTypes.Block> _userPlacedBlocks = new();
-        private readonly object _userPlacedBlocksLock = new();
+        private readonly ConcurrentDictionary<Vector2, ConcurrentDictionary<Vector3Int, DataTypes.Block>>
+            _userPlacedBlocksInChunks = new();
 
-        public Action<Vector3Int, DataTypes.Block> blockChanged = (_, _) => { };
+        public Action<Vector3Int, Vector3Int, DataTypes.Block> blockChanged = (_, _, _) => { };
 
         public override Task Init()
         {
@@ -21,9 +20,12 @@ namespace Unity_Maki_Space.Scripts.Managers
 
         public DataTypes.Block GetWorldBlock(Vector3Int worldPos)
         {
-            lock (_userPlacedBlocksLock)
+            var chunkPos = Utils.WorldPosToChunkPos(worldPos);
+            var posInChunk = Utils.WorldPosToPosInChunk(worldPos);
+
+            if (_userPlacedBlocksInChunks.TryGetValue(chunkPos, out var userPlacedBlocksInChunk))
             {
-                if (_userPlacedBlocks.TryGetValue(worldPos, out var userPlacedBlock))
+                if (userPlacedBlocksInChunk.TryGetValue(posInChunk, out var userPlacedBlock))
                 {
                     return userPlacedBlock;
                 }
@@ -64,8 +66,18 @@ namespace Unity_Maki_Space.Scripts.Managers
 
         public void SetWorldBlock(Vector3Int worldPos, DataTypes.Block block)
         {
-            _userPlacedBlocks[worldPos] = block;
-            blockChanged.Invoke(worldPos, block);
+            var chunkPos = Utils.WorldPosToChunkPos(worldPos);
+            var posInChunk = Utils.WorldPosToPosInChunk(worldPos);
+
+            if (!_userPlacedBlocksInChunks.TryGetValue(chunkPos, out var userPlacedBlocksInChunk))
+            {
+                userPlacedBlocksInChunk = _userPlacedBlocksInChunks[chunkPos] =
+                    new ConcurrentDictionary<Vector3Int, DataTypes.Block>();
+            }
+
+            userPlacedBlocksInChunk[posInChunk] = block;
+
+            blockChanged.Invoke(worldPos, posInChunk, block);
         }
     }
 }
