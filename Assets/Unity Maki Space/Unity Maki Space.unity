@@ -785,7 +785,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9757107a56e8f749ad7bab18f82a21b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  viewDistance: 32
+  viewDistance: 16
   playerCharacterTransform: {fileID: 323534708}
 --- !u!4 &1291422379
 Transform:

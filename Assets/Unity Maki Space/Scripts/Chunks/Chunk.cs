@@ -34,11 +34,6 @@ namespace Unity_Maki_Space.Scripts.Chunks
         public ChunkSystem chunkSystem;
         public Vector2Int chunkPosition;
 
-        private readonly DataTypes.Block[,,] _chunkData =
-            new DataTypes.Block[ChunkSystem.ChunkSize, ChunkSystem.ChunkHeight, ChunkSystem.ChunkSize];
-
-        private readonly Object _chunkDataLock = new();
-
         private MeshAsLists _meshData;
         private Mesh _mesh;
 
@@ -56,72 +51,7 @@ namespace Unity_Maki_Space.Scripts.Chunks
         //     GizmoUtils.DrawBounds(_bounds);
         // }
 
-        public void GenerateChunkDataThreadSafe()
-        {
-            const int tallestHeight = 128;
-
-            const float grassNoiseScale = 1 / 20f;
-            const float grassNoiseHeight = 4f;
-
-            const float biomeNoiseScale = 1 / 80f;
-
-            lock (_chunkDataLock)
-            {
-                for (var x = 0; x < ChunkSystem.ChunkSize; x++)
-                {
-                    for (var z = 0; z < ChunkSystem.ChunkSize; z++)
-                    {
-                        var worldPos =
-                            new Vector2Int(chunkPosition.x, chunkPosition.y) *
-                            ChunkSystem.ChunkSize +
-                            new Vector2Int(x, z);
-
-                        var biomeNoise = Mathf.PerlinNoise(
-                            worldPos.x * biomeNoiseScale,
-                            worldPos.y * biomeNoiseScale
-                        );
-
-                        var height = tallestHeight - Mathf.FloorToInt(
-                            Mathf.PerlinNoise(
-                                worldPos.x * grassNoiseScale,
-                                worldPos.y * grassNoiseScale
-                            ) * (grassNoiseHeight + 1f)
-                        );
-
-                        for (var y = 0; y < ChunkSystem.ChunkHeight; y++)
-                        {
-                            if (y < height)
-                            {
-                                if (biomeNoise < 0.4)
-                                {
-                                    // chunkData[x, y, z] = biomeNoise < 0.4 ? DataTypes.Block.Water : DataTypes.Block.Sand;
-                                    _chunkData[x, y, z] = DataTypes.Block.Sand;
-                                }
-                                else
-                                {
-                                    _chunkData[x, y, z] =
-                                        y == height - 1 ? DataTypes.Block.Grass : DataTypes.Block.Dirt;
-                                }
-                            }
-                            else
-                            {
-                                _chunkData[x, y, z] = DataTypes.Block.Air;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        public void SetThreadSafeBlock(Vector3Int positionInChunk, DataTypes.Block block)
-        {
-            lock (_chunkDataLock)
-            {
-                _chunkData[positionInChunk.x, positionInChunk.y, positionInChunk.z] = block;
-            }
-        }
-
-        public DataTypes.Block GetThreadSafeBlock(Vector3Int positionInChunk)
+        private DataTypes.Block GetBlock(Vector3Int positionInChunk)
         {
             if (
                 positionInChunk.x is < 0 or > ChunkSystem.ChunkSize - 1 ||
@@ -132,10 +62,11 @@ namespace Unity_Maki_Space.Scripts.Chunks
                 return DataTypes.Block.Air;
             }
 
-            lock (_chunkDataLock)
-            {
-                return _chunkData[positionInChunk.x, positionInChunk.y, positionInChunk.z];
-            }
+            var worldPos = positionInChunk + new Vector3Int(
+                chunkPosition.x * ChunkSystem.ChunkSize, 0, chunkPosition.y * ChunkSystem.ChunkSize
+            );
+
+            return DependencyManager.Instance.ChunkDataManager.GetWorldBlock(worldPos);
         }
 
         // 0 --- 1
@@ -245,44 +176,41 @@ namespace Unity_Maki_Space.Scripts.Chunks
 
             if (queryPositionInChunk.x is >= 0 and <= edge && queryPositionInChunk.z is >= 0 and <= edge)
             {
-                return GetThreadSafeBlock(queryPositionInChunk) == DataTypes.Block.Air;
+                return GetBlock(queryPositionInChunk) == DataTypes.Block.Air;
             }
 
             // outside of chunk
-
-            return true;
-
-            // TODO: make this work! the problem is related to chunk data not being available yet
-
-            var queryChunk = chunkSystem.GetThreadSafeChunk(
-                chunkPosition + new Vector2Int(queryOffset.x, queryOffset.z)
+            
+            var queryChunkPosition = chunkPosition + new Vector2Int(queryOffset.x, queryOffset.z);
+            var queryChunkWorldPosition = new Vector3Int(
+                queryChunkPosition.x * ChunkSystem.ChunkSize, 0, queryChunkPosition.y * ChunkSystem.ChunkSize
             );
-
+            
             switch (queryPositionInChunk.x)
             {
                 case < 0:
-                    return queryChunk.GetThreadSafeBlock(
-                        new Vector3Int(edge, blockPositionInChunk.y, blockPositionInChunk.z)
+                    return DependencyManager.Instance.ChunkDataManager.GetWorldBlock(
+                        new Vector3Int(edge, blockPositionInChunk.y, blockPositionInChunk.z) + queryChunkWorldPosition
                     ) == DataTypes.Block.Air;
                 case > edge:
-                    return queryChunk.GetThreadSafeBlock(
-                        new Vector3Int(0, blockPositionInChunk.y, blockPositionInChunk.z)
+                    return DependencyManager.Instance.ChunkDataManager.GetWorldBlock(
+                        new Vector3Int(0, blockPositionInChunk.y, blockPositionInChunk.z) + queryChunkWorldPosition
                     ) == DataTypes.Block.Air;
             }
 
             switch (queryPositionInChunk.z)
             {
                 case < 0:
-                    return queryChunk.GetThreadSafeBlock(
-                        new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, edge)
+                    return DependencyManager.Instance.ChunkDataManager.GetWorldBlock(
+                        new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, edge) + queryChunkWorldPosition
                     ) == DataTypes.Block.Air;
                 case > edge:
-                    return queryChunk.GetThreadSafeBlock(
-                        new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, 0)
+                    return DependencyManager.Instance.ChunkDataManager.GetWorldBlock(
+                        new Vector3Int(blockPositionInChunk.x, blockPositionInChunk.y, 0) + queryChunkWorldPosition
                     ) == DataTypes.Block.Air;
             }
 
-            return GetThreadSafeBlock(queryPositionInChunk) == DataTypes.Block.Air;
+            return GetBlock(queryPositionInChunk) == DataTypes.Block.Air;
         }
 
         private MeshAsLists GenerateMeshData()
@@ -305,7 +233,7 @@ namespace Unity_Maki_Space.Scripts.Chunks
                     for (var z = 0; z < ChunkSystem.ChunkSize; z++)
                     {
                         var position = new Vector3Int(x, y, z);
-                        var block = GetThreadSafeBlock(position);
+                        var block = GetBlock(position);
 
                         if (IsAirAroundBlock(position, DataTypes.BlockSide.Front))
                             AddSquareToCubeMesh(ref meshData, position, block, DataTypes.BlockSide.Front);

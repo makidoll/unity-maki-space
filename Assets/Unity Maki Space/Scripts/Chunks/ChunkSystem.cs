@@ -201,7 +201,6 @@ namespace Unity_Maki_Space.Scripts.Chunks
             var chunkComponent = chunk.AddComponent<Chunk>();
             chunkComponent.chunkSystem = this;
             chunkComponent.chunkPosition = chunkPosition;
-            chunkComponent.GenerateChunkDataThreadSafe();
 
             return chunkComponent;
         }

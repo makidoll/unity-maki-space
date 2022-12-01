@@ -16,6 +16,8 @@ namespace Unity_Maki_Space.Scripts.Managers
         [Header("UI Manager")] public Canvas uiCanvas;
         public UIManager UIManager;
 
+        public ChunkDataManager ChunkDataManager;
+
         public List<GameObject> persistantGameObjects;
         
         private Manager[] _managers;
@@ -40,6 +42,8 @@ namespace Unity_Maki_Space.Scripts.Managers
             
             newManagers.Add(UIManager = new UIManager(uiCanvas));
             persistantGameObjects.Add(uiCanvas.gameObject);
+            
+            newManagers.Add(ChunkDataManager = new ChunkDataManager());
 
             _managers = newManagers.ToArray();
             
