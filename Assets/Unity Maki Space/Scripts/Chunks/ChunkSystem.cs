@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Unity_Maki_Space.Scripts.Managers;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -51,6 +52,8 @@ namespace Unity_Maki_Space.Scripts.Chunks
                 EditorApplication.update += UpdateFn;
             }
 #endif
+
+            DependencyManager.Instance.ChunkDataManager.blockChanged += OnBlockChanged;
         }
 
         private void OnDisable()
@@ -140,6 +143,42 @@ namespace Unity_Maki_Space.Scripts.Chunks
             }
         }
 
+        private int glslMod(int x, int m)
+        {
+            return (x % m + m) % m;
+        }
+
+        private void OnBlockChanged(Vector3Int worldPos, DataTypes.Block block)
+        {
+            var chunkPosition = new Vector2Int(
+                Mathf.FloorToInt((float)worldPos.x / ChunkSize),
+                Mathf.FloorToInt((float)worldPos.z / ChunkSize)
+            );
+
+            GetThreadSafeChunk(chunkPosition)?.ReloadThreadSafe();
+
+            // if block is on the edge, reload chunk next to it
+
+            switch (glslMod(worldPos.x, ChunkSize))
+            {
+                case 0:
+                    GetThreadSafeChunk(chunkPosition + new Vector2Int(-1, 0))?.ReloadThreadSafe();
+                    break;
+                case ChunkSize - 1:
+                    GetThreadSafeChunk(chunkPosition + new Vector2Int(1, 0))?.ReloadThreadSafe();
+                    break;
+            }
+            
+            switch (glslMod(worldPos.z, ChunkSize))
+            {
+                case 0:
+                    GetThreadSafeChunk(chunkPosition + new Vector2Int(0, -1))?.ReloadThreadSafe();
+                    break;
+                case ChunkSize - 1:
+                    GetThreadSafeChunk(chunkPosition + new Vector2Int(0, 1))?.ReloadThreadSafe();
+                    break;
+            }
+        }
 
         private Vector2Int GetPlayerChunkPosition()
         {
@@ -194,7 +233,8 @@ namespace Unity_Maki_Space.Scripts.Chunks
                     position = position,
                     parent = transform
                 },
-                hideFlags = HideFlags.DontSave
+                hideFlags = HideFlags.DontSave,
+                layer = LayerMask.NameToLayer("Chunk")
                 // hideFlags = HideFlags.HideAndDontSave
             };
 
