@@ -44,6 +44,8 @@ namespace Unity_Maki_Space.Scripts.Chunks
 
         private readonly CancellationTokenSource _cts = new();
 
+        public bool lockedDontDoAnyWork;
+
         // private Bounds _bounds;
         //
         // private void OnDrawGizmosSelected()
@@ -180,12 +182,12 @@ namespace Unity_Maki_Space.Scripts.Chunks
             }
 
             // outside of chunk
-            
+
             var queryChunkPosition = chunkPosition + new Vector2Int(queryOffset.x, queryOffset.z);
             var queryChunkWorldPosition = new Vector3Int(
                 queryChunkPosition.x * ChunkSystem.ChunkSize, 0, queryChunkPosition.y * ChunkSystem.ChunkSize
             );
-            
+
             switch (queryPositionInChunk.x)
             {
                 case < 0:
@@ -319,6 +321,22 @@ namespace Unity_Maki_Space.Scripts.Chunks
             _cts.Cancel();
             doingExternalThreadWork = false;
             status = ChunkStatus.NeedMeshGen;
+        }
+
+        public async void ForceReloadOnMainThread()
+        {
+            lockedDontDoAnyWork = true;
+
+            _cts.Cancel();
+            doingExternalThreadWork = false;
+            status = ChunkStatus.NeedMeshGen;
+
+            await DoExternalThreadWork();
+            DoMainThreadWork();
+            await DoExternalThreadWork();
+            DoMainThreadWork();
+
+            lockedDontDoAnyWork = false;
         }
 
         public Task DoExternalThreadWork()

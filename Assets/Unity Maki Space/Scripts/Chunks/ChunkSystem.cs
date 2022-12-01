@@ -130,12 +130,13 @@ namespace Unity_Maki_Space.Scripts.Chunks
         {
             return _chunks.TryGetValue(position, out var chunk) ? chunk : null;
         }
-        
+
         private void OnBlockChanged(Vector3Int worldPos, Vector3Int posInChunk, DataTypes.Block block)
         {
             var chunkPosition = Utils.WorldPosToChunkPos(worldPos);
 
-            GetThreadSafeChunk(chunkPosition)?.ReloadThreadSafe();
+            // GetThreadSafeChunk(chunkPosition)?.ReloadThreadSafe();
+            GetThreadSafeChunk(chunkPosition)?.ForceReloadOnMainThread();
 
             // if block is on the edge, reload chunk next to it
 
@@ -148,7 +149,7 @@ namespace Unity_Maki_Space.Scripts.Chunks
                     GetThreadSafeChunk(chunkPosition + new Vector2Int(1, 0))?.ReloadThreadSafe();
                     break;
             }
-            
+
             switch (posInChunk.z)
             {
                 case 0:
@@ -244,6 +245,7 @@ namespace Unity_Maki_Space.Scripts.Chunks
                     var queryChunk = GetThreadSafeChunk(position);
                     if (
                         queryChunk == null ||
+                        queryChunk.lockedDontDoAnyWork ||
                         queryChunk.doingExternalThreadWork ||
                         queryChunk.status is not (ChunkStatus.NeedMeshGen or ChunkStatus.NeedPhysicsBake)
                     ) continue;
@@ -284,7 +286,11 @@ namespace Unity_Maki_Space.Scripts.Chunks
                 if (chunk != null)
                 {
                     // if thread generated mesh data but it's not been applied yet (has to be done in main thread)
-                    if (canUpdateOneChunk && chunk.status is ChunkStatus.GotMeshGen or ChunkStatus.GotPhysicsBake)
+                    if (
+                        canUpdateOneChunk &&
+                        !chunk.lockedDontDoAnyWork &&
+                        chunk.status is ChunkStatus.GotMeshGen or ChunkStatus.GotPhysicsBake
+                    )
                     {
                         chunk.DoMainThreadWork();
                         canUpdateOneChunk = false;
